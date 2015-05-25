@@ -1,4 +1,4 @@
-from demands import HTTPServiceClient, HTTPServiceError
+from demands import HTTPServiceClient
 from yoconfig import get_config
 
 
