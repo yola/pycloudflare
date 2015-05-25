@@ -1,7 +1,2 @@
-[files]
-ignore = scripts/*
-    data/*
-    */migrations/*
-
 [tools]
-linters = flake8, jshint
+linters = flake8
