@@ -16,7 +16,7 @@ Get all our zones at CloudFlare
 ## Configuration
 
 The service client is configured when it is instantiated and reads its
-configuration from [`yoconfig`][1]:
+configuration from `yoconfig`:
 
 Django (or other) applications wishing to configure the service client,
 can use `yoconfig.configure_services`.
