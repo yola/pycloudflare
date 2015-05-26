@@ -20,5 +20,6 @@ class ZonesTest(TestCase):
         self.assertIsInstance(zones, list)
 
     def test_get_zone(self):
-        zone = self.cloudflare.get_zones()[0]
+        zone_id = self.cloudflare.get_zones()[0]['id']
+        zone = self.cloudflare.get_zone(zone_id)
         self.assertIsInstance(zone, dict)
