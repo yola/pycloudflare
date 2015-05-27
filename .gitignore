@@ -1,1 +1,6 @@
 *.pyc
+
+virtualenv.tar.gz
+
+pycloudflare.egg-info/
+virtualenv/
