@@ -28,7 +28,7 @@ configure_services('application_name', ['cloudflare'], {
     'cloudflare': {
         'url': 'https://api.cloudflare.com/client/v4/',
         'api_key': '<api_key>',
-        'email': 'tech@yola.com'
+        'email': '<email_addres>'
     },
 })
 ```
