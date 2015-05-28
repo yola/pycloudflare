@@ -1,3 +1,5 @@
+from itertools import count
+
 from demands import HTTPServiceClient
 from yoconfig import get_config
 
@@ -14,15 +16,13 @@ class CloudFlareService(HTTPServiceClient):
 
     def get_zones(self):
         zones = []
-        page = 1
-        while True:
+        for page in count():
             batch = self.get(
                 'zones?page=%s&per_page=50' % page).json()['result']
             if batch:
                 zones.extend(batch)
             else:
                 break
-            page += 1
         return zones
 
     def get_zone(self, zone_id):
