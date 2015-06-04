@@ -16,7 +16,8 @@ class CloudFlareService(HTTPServiceClient):
 
     def iter_zones(self):
         for page in count():
-            batch = self.get('zones?page=%i&per_page=50' % page).json()['result']
+            batch = self.get(
+                'zones?page=%i&per_page=50' % page).json()['result']
             if not batch:
                 return
             for result in batch:
