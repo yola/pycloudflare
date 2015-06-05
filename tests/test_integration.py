@@ -1,4 +1,5 @@
 import os
+import types
 from unittest import TestCase
 
 from yoconfigurator.base import read_config
@@ -16,8 +17,8 @@ class ZonesTest(TestCase):
         self.cloudflare = CloudFlareService()
 
     def test_get_all_zones(self):
-        zones = self.cloudflare.get_zones()
-        self.assertIsInstance(zones, list)
+        zones = self.cloudflare.iter_zones()
+        self.assertIsInstance(zones, types.GeneratorType)
 
     def test_get_zone(self):
         zone_id = self.cloudflare.get_zones()[0]['id']
