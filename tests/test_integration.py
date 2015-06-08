@@ -1,5 +1,4 @@
 import os
-import types
 from unittest import TestCase
 
 from yoconfigurator.base import read_config
