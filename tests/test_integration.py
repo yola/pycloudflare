@@ -16,9 +16,9 @@ class ZonesTest(TestCase):
         configure_services('cloudflare', ['cloudflare'], conf.common)
         self.cloudflare = CloudFlareService()
 
-    def test_get_all_zones(self):
-        zones = self.cloudflare.iter_zones()
-        self.assertIsInstance(zones, types.GeneratorType)
+    def test_iter_zones(self):
+        zone = next(self.cloudflare.iter_zones())
+        self.assertIsInstance(zone, dict)
 
     def test_get_zone(self):
         zone_id = self.cloudflare.get_zones()[0]['id']
