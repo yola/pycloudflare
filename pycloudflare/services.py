@@ -28,3 +28,6 @@ class CloudFlareService(HTTPServiceClient):
 
     def get_zone(self, zone_id):
         return self.get('zones/%s' % zone_id).json()['result']
+
+    def get_resource_records(self, zone_id):
+        return self.get('zones/%s/dns_records' % zone_id).json()['result']
