@@ -8,18 +8,18 @@ from pycloudflare.services import CloudFlareService
 
 app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 conf = read_config(app_dir)
+configure_services('cloudflare', ['cloudflare'], conf.common)
 
 
 class ZonesTest(TestCase):
     def setUp(self):
-        configure_services('cloudflare', ['cloudflare'], conf.common)
-        self.cloudflare = CloudFlareService()
+        self.cf = CloudFlareService()
 
     def test_iter_zones(self):
-        zone = next(self.cloudflare.iter_zones())
+        zone = next(self.cf.iter_zones())
         self.assertIsInstance(zone, dict)
 
     def test_get_zone(self):
-        zone_id = next(self.cloudflare.iter_zones())['id']
+        zone_id = next(self.cf.iter_zones())['id']
         zone = self.cloudflare.get_zone(zone_id)
         self.assertIsInstance(zone, dict)
