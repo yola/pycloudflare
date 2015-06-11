@@ -23,3 +23,8 @@ class ZonesTest(TestCase):
         zone_id = next(self.cloudflare.iter_zones())['id']
         zone = self.cloudflare.get_zone(zone_id)
         self.assertIsInstance(zone, dict)
+
+    def test_get_resource_records(self):
+        zone_id = next(self.cloudflare.iter_zones())['id']
+        resource_records = self.cloudflare.get_resource_records(zone_id)
+        self.assertIsInstance(resource_records, list)
