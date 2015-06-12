@@ -72,3 +72,25 @@ class CloudFlareService(HTTPServiceClient):
 
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)
+
+    def iter_dns_records(self, zone_id):
+        return self._iter_pages('zones/%s/dns_records' % zone_id)
+
+    def get_dns_records(self, zone_id):
+        return list(self.iter_dns_records(zone_id))
+
+    def get_dns_record(self, zone_id, record_id):
+        url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
+        return self.get(url).json()['result']
+
+    def create_dns_record(self, zone_id, content):
+        url = 'zones/%s/dns_records' % zone_id
+        return self.post(url, content).json()['result']
+
+    def update_dns_record(self, zone_id, record_id, content):
+        url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
+        return self.patch(url, content).json()['result']
+
+    def delete_dns_record(self, zone_id, record_id):
+        url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
+        return self.delete(url).json()['result']

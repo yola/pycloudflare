@@ -31,6 +31,19 @@ class ZoneTest(TestCase):
         except HTTPServiceError:
             zone = cls.cf.get_zone_by_name(cls.zone_name)
         cls.zone_id = zone['id']
+        try:
+            record = cls.cf.create_dns_record(cls.zone_id, {
+                'name': 'foo.example.net',
+                'type': 'A',
+                'content': '127.0.0.1',
+                'proxied': False,
+                'ttl': 1,
+            })
+        except HTTPServiceError:
+            for record in cls.cf.iter_dns_records(cls.zone_id):
+                if record['name'] == 'foo.example.net':
+                    break
+        cls.record_id = record['id']
 
     @classmethod
     def tearDownClass(cls):
@@ -58,3 +71,28 @@ class ZoneTest(TestCase):
         setting = self.cf.set_zone_setting(self.zone_id, 'always_online', 'on')
         self.assertIn('value', setting)
         self.assertEqual(setting['value'], 'on')
+
+    def test_get_dns_records(self):
+        records = self.cf.get_dns_records(self.zone_id)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]['content'], '127.0.0.1')
+
+    def test_get_dns_record(self):
+        record = self.cf.get_dns_record(self.zone_id, self.record_id)
+        self.assertEqual(record['content'], '127.0.0.1')
+
+    def test_update_dns_record(self):
+        record = self.cf.update_dns_record(
+            self.zone_id, self.record_id, {'content': '127.0.0.2'})
+        self.assertEqual(record['content'], '127.0.0.2')
+
+    def test_create_delete_dns_record(self):
+        record = self.cf.create_dns_record(self.zone_id, {
+            'name': 'bar.example.net',
+            'type': 'CNAME',
+            'content': 'example.org',
+            'proxied': True,
+            'ttl': 1,
+        })
+        self.assertIsInstance(record, dict)
+        self.cf.delete_dns_record(self.zone_id, record['id'])
