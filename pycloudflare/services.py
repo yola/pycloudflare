@@ -53,6 +53,14 @@ class CloudFlareService(HTTPServiceClient):
     def get_zone_settings(self, zone_id):
         return dict(self.iter_zone_settings(zone_id))
 
+    def get_zone_setting(self, zone_id, setting):
+        url = 'zones/%s/settings/%s' % (zone_id, setting)
+        return self.get(url).json()['result']
+
+    def set_zone_setting(self, zone_id, setting, value):
+        url = 'zones/%s/settings/%s' % (zone_id, setting)
+        return self.patch(url, {'value': value}).json()['result']
+
     def create_zone(self, name, jump_start=False):
         data = {
             'name': name,
