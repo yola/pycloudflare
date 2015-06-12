@@ -1,4 +1,5 @@
 demands == 1.0.6
+mock == 1.0.1
 nose == 1.3.4
 yoconfig == 0.2.0
 yoconfigurator == 0.4.6

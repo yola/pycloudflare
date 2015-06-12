@@ -17,14 +17,22 @@ class CloudFlareService(HTTPServiceClient):
         super(CloudFlareService, self).__init__(
             config['url'], headers=headers, send_as_json=True)
 
-    def iter_zones(self):
+    def _iter_pages(self, base_url, params=None, page_size=50):
+        base_params = params or {}
+        base_params['per_page'] = page_size
+
         for page in count():
-            batch = self.get(
-                'zones?page=%i&per_page=50' % page).json()['result']
-            if not batch:
-                return
+            params = base_params.copy()
+            params['page'] = page
+            url = base_url + '?' + urlencode(params)
+            batch = self.get(url).json()['result']
             for result in batch:
                 yield result
+            if len(batch) < page_size:
+                return
+
+    def iter_zones(self):
+        return self._iter_pages('zones')
 
     def get_zones(self):
         return list(self.iter_zones())
