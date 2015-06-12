@@ -46,6 +46,13 @@ class CloudFlareService(HTTPServiceClient):
         assert len(result) <= 1
         return result[0]
 
+    def iter_zone_settings(self, zone_id):
+        for setting in self._iter_pages('zones/%s/settings' % zone_id):
+            yield setting['id'], setting
+
+    def get_zone_settings(self, zone_id):
+        return dict(self.iter_zone_settings(zone_id))
+
     def create_zone(self, name, jump_start=False):
         data = {
             'name': name,
