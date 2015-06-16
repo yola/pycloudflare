@@ -1,8 +1,12 @@
+import logging
 from itertools import count
 from urllib import urlencode
 
-from demands import HTTPServiceClient
+from demands import HTTPServiceClient, HTTPServiceError
 from yoconfig import get_config
+
+
+log = logging.getLogger(__name__)
 
 
 class CloudFlareService(HTTPServiceClient):
@@ -94,3 +98,78 @@ class CloudFlareService(HTTPServiceClient):
 
     def delete_dns_record(self, zone_id, record_id):
         return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))
+
+
+class CloudFlareHostService(HTTPServiceClient):
+    def __init__(self, **kwargs):
+        config = get_config('cloudflare')
+        data = {
+            'host_key': config['api_key'],
+        }
+        self.gw = 'host-gw.html'
+        super(CloudFlareHostService, self).__init__(config['url'], data=data)
+
+    def post_send(self, response, **kwargs):
+        """
+        These endpoints don't use HTTP response codes to indicate
+        application-level errors
+        """
+        response = super(CloudFlareHostService, self).post_send(
+            response, **kwargs)
+        if response.json()['result'] == 'error':
+            err_code = response.json()['err_code']
+            msg = response.json()['msg']
+            data = kwargs['data'].copy()
+            data.pop('host_key')
+            act = data.pop('act')
+            log.error('Error response %s: %s from %s with %r',
+                      err_code, msg, act, data)
+            raise HTTPServiceError(response)
+        return response.json()['response']
+
+    def user_create(self, email, password, username=None, unique_id=None):
+        data = {
+            'act': 'user_create',
+            'cloudflare_email': email,
+            'cloudflare_pass': password,
+        }
+        if username:
+            data['cloudflare_username'] = username
+        if unique_id:
+            data['unique_id'] = unique_id
+        return self.post(self.gw, data)
+
+    def user_lookup(self, email=None, unique_id=None):
+        data = {
+            'act': 'user_lookup',
+        }
+        if email:
+            data['cloudflare_email'] = email
+        elif unique_id:
+            data['unique_id'] = unique_id
+        else:
+            raise ValueError('Requires email or unique_id')
+        return self.post(self.gw, data)
+
+    def iter_zone_list(self, zone_name=None, zone_status=None, sub_id=None,
+                       sub_status=None):
+        limit = 100
+        data = {
+            'act': 'zone_list',
+            'limit': limit,
+        }
+        if zone_name:
+            data['zone_name'] = zone_name
+        if zone_status:
+            data['zone_status'] = zone_status
+        if sub_id:
+            data['sub_id'] = sub_id
+        if sub_status:
+            data['sub_status'] = sub_status
+        for offset in count(0, limit):
+            data['offset'] = offset
+            zones = self.post(self.gw, data)
+            for zone in zones:
+                yield zone
+            if len(zones) < limit:
+                break

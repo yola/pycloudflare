@@ -1,30 +1,41 @@
 import os
 from unittest import TestCase
+from uuid import uuid4
 
 from demands import HTTPServiceError
 from yoconfigurator.base import read_config
 from yoconfig import configure_services
 
-from pycloudflare.services import CloudFlareService
+from pycloudflare.services import CloudFlareHostService, CloudFlareService
 
 
-def cf_service():
+TEST_USER = {}
+
+
+def setUpModule():
     app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     conf = read_config(app_dir)
     configure_services('cloudflare', ['cloudflare'], conf.common)
-    # TODO: Create a test account via the partner API
-    client_conf = conf.common.cloudflare.yola_other_domains
-    return CloudFlareService(api_key=client_conf.api_key,
-                             email=client_conf.email)
+
+    cfh = CloudFlareHostService()
+    TEST_USER['password'] = uuid4().hex
+    TEST_USER['unique_id'] = uuid4().hex
+    TEST_USER['email'] = '%s@integrationtest.example.net' % uuid4().hex
+    r = cfh.user_create(email=TEST_USER['email'],
+                        password=TEST_USER['password'],
+                        unique_id=TEST_USER['unique_id'],)
+    TEST_USER['api_key'] = r['user_api_key']
 
 
-class ZonesTest(TestCase):
-    def setUp(self):
-        self.cf = cf_service()
+def tearDownModule():
+    cf = cf_service()
+    for zone in cf.iter_zones():
+        cf.delete_zone(zone['id'])
 
-    def test_iter_zones(self):
-        zone = next(self.cf.iter_zones())
-        self.assertIsInstance(zone, dict)
+
+def cf_service():
+    return CloudFlareService(email=TEST_USER['email'],
+                             api_key=TEST_USER['api_key'])
 
 
 class ZoneTest(TestCase):
@@ -54,6 +65,10 @@ class ZoneTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.cf.delete_zone(cls.zone_id)
+
+    def test_iter_zones(self):
+        zone = next(self.cf.iter_zones())
+        self.assertIsInstance(zone, dict)
 
     def test_get_zone(self):
         zone = self.cf.get_zone(self.zone_id)
@@ -102,3 +117,38 @@ class ZoneTest(TestCase):
         })
         self.assertIsInstance(record, dict)
         self.cf.delete_dns_record(self.zone_id, record['id'])
+
+
+class HostZonesTest(TestCase):
+    def setUp(self):
+        self.cfh = CloudFlareHostService()
+
+    def test_iter_zone_list(self):
+        try:
+            zone = next(self.cfh.iter_zone_list())
+        except StopIteration:
+            pass
+        else:
+            self.assertIsInstance(zone, dict)
+
+
+class HostUserTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.cfh = CloudFlareHostService()
+        cls.email = TEST_USER['email']
+        cls.password = TEST_USER['password']
+        cls.unique_id = TEST_USER['unique_id']
+
+    def test_user_lookup_by_email(self):
+        user = self.cfh.user_lookup(email=self.email)
+        self.assertIsInstance(user, dict)
+
+    def test_user_lookup_by_unique_id(self):
+        user = self.cfh.user_lookup(unique_id=self.unique_id)
+        self.assertIsInstance(user, dict)
+
+    def test_user_create(self):
+        user = self.cfh.user_create(self.email, self.password,
+                                    unique_id=self.unique_id)
+        self.assertIsInstance(user, dict)
