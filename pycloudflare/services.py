@@ -18,6 +18,10 @@ class CloudFlareService(HTTPServiceClient):
         super(CloudFlareService, self).__init__(
             url, headers=headers, send_as_json=True)
 
+    def post_send(self, response, **kwargs):
+        response = super(CloudFlareService, self).post_send(response, **kwargs)
+        return response.json()['result']
+
     def _iter_pages(self, base_url, params=None, page_size=50):
         base_params = params or {}
         base_params['per_page'] = page_size
@@ -26,7 +30,7 @@ class CloudFlareService(HTTPServiceClient):
             params = base_params.copy()
             params['page'] = page
             url = base_url + '?' + urlencode(params)
-            batch = self.get(url).json()['result']
+            batch = self.get(url)
             for result in batch:
                 yield result
             if len(batch) < page_size:
@@ -39,11 +43,10 @@ class CloudFlareService(HTTPServiceClient):
         return list(self.iter_zones())
 
     def get_zone(self, zone_id):
-        return self.get('zones/%s' % zone_id).json()['result']
+        return self.get('zones/%s' % zone_id)
 
     def get_zone_by_name(self, name):
-        url = 'zones?' + urlencode({'name': name})
-        result = self.get(url).json()['result']
+        result = self.get('zones?' + urlencode({'name': name}))
         assert len(result) <= 1
         return result[0]
 
@@ -55,12 +58,11 @@ class CloudFlareService(HTTPServiceClient):
         return dict(self.iter_zone_settings(zone_id))
 
     def get_zone_setting(self, zone_id, setting):
-        url = 'zones/%s/settings/%s' % (zone_id, setting)
-        return self.get(url).json()['result']
+        return self.get('zones/%s/settings/%s' % (zone_id, setting))
 
     def set_zone_setting(self, zone_id, setting, value):
         url = 'zones/%s/settings/%s' % (zone_id, setting)
-        return self.patch(url, {'value': value}).json()['result']
+        return self.patch(url, {'value': value})
 
     def create_zone(self, name, jump_start=False):
         data = {
@@ -69,7 +71,7 @@ class CloudFlareService(HTTPServiceClient):
         }
         if self._organization:
             data['organization'] = {'id': self._organization}
-        return self.post('zones', data).json()['result']
+        return self.post('zones', data)
 
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)
@@ -81,17 +83,14 @@ class CloudFlareService(HTTPServiceClient):
         return list(self.iter_dns_records(zone_id))
 
     def get_dns_record(self, zone_id, record_id):
-        url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
-        return self.get(url).json()['result']
+        return self.get('zones/%s/dns_records/%s' % (zone_id, record_id))
 
     def create_dns_record(self, zone_id, content):
-        url = 'zones/%s/dns_records' % zone_id
-        return self.post(url, content).json()['result']
+        return self.post('zones/%s/dns_records' % zone_id, content)
 
     def update_dns_record(self, zone_id, record_id, content):
         url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
-        return self.patch(url, content).json()['result']
+        return self.patch(url, content)
 
     def delete_dns_record(self, zone_id, record_id):
-        url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
-        return self.delete(url).json()['result']
+        return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))

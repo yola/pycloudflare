@@ -1,7 +1,7 @@
 from unittest import TestCase
 from urlparse import parse_qs, urlparse
 
-from mock import Mock, patch
+from mock import patch
 
 from pycloudflare.services import CloudFlareService
 
@@ -14,8 +14,7 @@ class PaginationTest(TestCase):
             page_size = int(params['per_page'][0])
             start = page * page_size
             end = start + page_size
-            r = {'result': self.responses[start:end]}
-            return Mock(**{'json.return_value': r})
+            return self.responses[start:end]
 
         patcher = patch('pycloudflare.services.CloudFlareService.get',
                         side_effect=get)
