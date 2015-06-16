@@ -6,16 +6,17 @@ from yoconfig import get_config
 
 
 class CloudFlareService(HTTPServiceClient):
-    def __init__(self, **kwargs):
+    def __init__(self, api_key, email, organization=None):
         config = get_config('cloudflare')
         headers = {
             'Content-Type': 'application/json',
-            'X-Auth-Key': config['api_key'],
-            'X-Auth-Email': config['email']
+            'X-Auth-Key': api_key,
+            'X-Auth-Email': email,
         }
-        self._organization = config.get('organization')
+        self._organization = organization
+        url = config['url'] + 'client/v4/'
         super(CloudFlareService, self).__init__(
-            config['url'], headers=headers, send_as_json=True)
+            url, headers=headers, send_as_json=True)
 
     def _iter_pages(self, base_url, params=None, page_size=50):
         base_params = params or {}

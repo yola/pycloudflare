@@ -22,7 +22,7 @@ class PaginationTest(TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-        self.cf = CloudFlareService()
+        self.cf = CloudFlareService(api_key='ABC', email='foo@example.com')
 
     def test_one_undersized_page(self):
         self.responses = range(5)

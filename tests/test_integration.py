@@ -7,14 +7,20 @@ from yoconfig import configure_services
 
 from pycloudflare.services import CloudFlareService
 
-app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-conf = read_config(app_dir)
-configure_services('cloudflare', ['cloudflare'], conf.common)
+
+def cf_service():
+    app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    conf = read_config(app_dir)
+    configure_services('cloudflare', ['cloudflare'], conf.common)
+    # TODO: Create a test account via the partner API
+    client_conf = conf.common.cloudflare.yola_other_domains
+    return CloudFlareService(api_key=client_conf.api_key,
+                             email=client_conf.email)
 
 
 class ZonesTest(TestCase):
     def setUp(self):
-        self.cf = CloudFlareService()
+        self.cf = cf_service()
 
     def test_iter_zones(self):
         zone = next(self.cf.iter_zones())
@@ -24,7 +30,7 @@ class ZonesTest(TestCase):
 class ZoneTest(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.cf = CloudFlareService()
+        cls.cf = cf_service()
         cls.zone_name = 'example.net'
         try:
             zone = cls.cf.create_zone(cls.zone_name)
