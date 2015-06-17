@@ -115,16 +115,17 @@ class CloudFlareHostService(HTTPServiceClient):
         """
         response = super(CloudFlareHostService, self).post_send(
             response, **kwargs)
-        if response.json()['result'] == 'error':
-            err_code = response.json()['err_code']
-            msg = response.json()['msg']
+        response_json = response.json()
+        if response_json['result'] == 'error':
+            err_code = response_json['err_code']
+            msg = response_json['msg']
             data = kwargs['data'].copy()
             data.pop('host_key')
             act = data.pop('act')
             log.error('Error response %s: %s from %s with %r',
                       err_code, msg, act, data)
             raise HTTPServiceError(response)
-        return response.json()['response']
+        return response_json['response']
 
     def user_create(self, email, password, username=None, unique_id=None):
         data = {
