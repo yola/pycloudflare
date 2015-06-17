@@ -132,23 +132,19 @@ class CloudFlareHostService(HTTPServiceClient):
             'act': 'user_create',
             'cloudflare_email': email,
             'cloudflare_pass': password,
+            'cloudflare_username': username,
+            'unique_id': unique_id,
         }
-        if username:
-            data['cloudflare_username'] = username
-        if unique_id:
-            data['unique_id'] = unique_id
         return self.post(self.gw, data)
 
     def user_lookup(self, email=None, unique_id=None):
+        if not (email or unique_id):
+            raise ValueError('Requires email or unique_id')
         data = {
             'act': 'user_lookup',
+            'cloudflare_email': email,
+            'unique_id': unique_id,
         }
-        if email:
-            data['cloudflare_email'] = email
-        elif unique_id:
-            data['unique_id'] = unique_id
-        else:
-            raise ValueError('Requires email or unique_id')
         return self.post(self.gw, data)
 
     def iter_zone_list(self, zone_name=None, zone_status=None, sub_id=None,
@@ -157,15 +153,11 @@ class CloudFlareHostService(HTTPServiceClient):
         data = {
             'act': 'zone_list',
             'limit': limit,
+            'sub_id': sub_id,
+            'sub_status': sub_status,
+            'zone_name': zone_name,
+            'zone_status': zone_status,
         }
-        if zone_name:
-            data['zone_name'] = zone_name
-        if zone_status:
-            data['zone_status'] = zone_status
-        if sub_id:
-            data['sub_id'] = sub_id
-        if sub_status:
-            data['sub_status'] = sub_status
         for offset in count(0, limit):
             data['offset'] = offset
             zones = self.post(self.gw, data)
