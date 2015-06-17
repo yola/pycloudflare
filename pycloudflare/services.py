@@ -10,14 +10,13 @@ log = logging.getLogger(__name__)
 
 
 class CloudFlareService(HTTPServiceClient):
-    def __init__(self, api_key, email, organization=None):
+    def __init__(self, api_key, email):
         config = get_config('cloudflare')
         headers = {
             'Content-Type': 'application/json',
             'X-Auth-Key': api_key,
             'X-Auth-Email': email,
         }
-        self._organization = organization
         url = config['url'] + 'client/v4/'
         super(CloudFlareService, self).__init__(
             url, headers=headers, send_as_json=True)
@@ -68,12 +67,12 @@ class CloudFlareService(HTTPServiceClient):
         url = 'zones/%s/settings/%s' % (zone_id, setting)
         return self.patch(url, {'value': value})
 
-    def create_zone(self, name, jump_start=False):
+    def create_zone(self, name, jump_start=False, organization=None):
         data = {
             'name': name,
             'jump_start': jump_start,
         }
-        if self._organization:
+        if organization:
             data['organization'] = {'id': self._organization}
         return self.post('zones', data)
 
