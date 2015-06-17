@@ -23,7 +23,7 @@ def setUpModule():
     TEST_USER['email'] = '%s@integrationtest.example.net' % uuid4().hex
     r = cfh.user_create(email=TEST_USER['email'],
                         password=TEST_USER['password'],
-                        unique_id=TEST_USER['unique_id'],)
+                        unique_id=TEST_USER['unique_id'])
     TEST_USER['api_key'] = r['user_api_key']
 
 
