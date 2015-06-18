@@ -14,6 +14,7 @@ setup(
     test_suite='nose.collector',
     install_requires=[
         'demands >= 1.0.5, < 2.0.0',
+        'property-caching >= 1.0.0, < 2.0.0',
         'yoconfig >= 0.1.0, < 0.2.0',
     ]
 )
