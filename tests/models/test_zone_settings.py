@@ -29,18 +29,23 @@ class TestZoneSettings(FakedServiceTestCase):
     def test_returns_setting_names_in_iteration(self):
         self.assertEqual(next(iter(self.zone.settings)), 'always_online')
 
-    def test_updates_on_set(self):
+    def test_rejects_unknown_settings_writes(self):
+        with self.assertRaises(IndexError):
+            self.zone.settings['nonexistent_setting'] = True
+
+    def test_pending_changes_are_visible(self):
         self.assertEqual(self.zone.settings['always_online'], 'on')
         self.zone.settings['always_online'] = 'off'
         self.assertEqual(self.zone.settings['always_online'], 'off')
 
-    def test_can_set_when_uncached(self):
-        self.assertEqual(self.zone.settings._settings, ())
-        self.zone.settings['always_online'] = 'off'
-        self.assertEqual(self.zone.settings['always_online'], 'off')
-
-    def test_updates_setting_on_set(self):
+    def test_save_without_changes_is_noop(self):
         with patch.object(self.zone.service, 'set_zone_setting'):
-            self.zone.settings['always_online'] = 'off'
+            self.zone.settings.save()
+            self.assertEqual(self.zone.service.set_zone_setting.call_count, 0)
+
+    def test_save_performs_update(self):
+        self.zone.settings['always_online'] = 'off'
+        with patch.object(self.zone.service, 'set_zone_setting'):
+            self.zone.settings.save()
             self.zone.service.set_zone_setting.assert_called_with(
                 self.zone.id, 'always_online', 'off')

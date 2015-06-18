@@ -41,6 +41,10 @@ class TestCreateRecord(FakedServiceTestCase):
     def test_has_data_attribute(self):
         self.assertEqual(self.record.data, {})
 
+    def test_doesnt_have_nonexistent_attribute(self):
+        with self.assertRaises(AttributeError):
+            self.record.nonexistent
+
     def test_invalidates_zone_records(self):
         self.assertNotIn('baz.example.com', self.zone.records)
         self.zone.create_record('baz.example.com', 'A', '127.0.0.1')
@@ -81,17 +85,29 @@ class TestUpdateRecord(FakedServiceTestCase):
         self.zone = self.user.get_zone_by_name('example.com')
         self.record = self.zone.records['example.com'][0]
 
-    def test_updates_on_set(self):
+    def test_unknown_attribute_sets_are_rejected(self):
+        with self.assertRaises(AttributeError):
+            self.record.unknown_attribute = True
+
+    def test_pending_changes_are_visible(self):
         self.record.proxied = True
         self.assertEqual(self.record.proxied, True)
 
-    def test_updates_record_on_set(self):
+    def test_save_without_changes_is_noop(self):
         with patch.object(self.record.service, 'update_dns_record'):
-            self.record.proxied = True
+            self.record.save()
+            self.assertEqual(
+                self.record.service.update_dns_record.call_count, 0)
+
+    def test_save_performs_update(self):
+        self.record.proxied = True
+        with patch.object(self.record.service, 'update_dns_record'):
+            self.record.save()
             self.record.service.update_dns_record.assert_called_with(
                 self.zone.id, self.record.id, {'proxied': True})
 
     def test_invalidates_zone_records_on_rename(self):
         self.assertNotIn('quux.example.com', self.zone.records)
         self.record.name = 'quux.example.com'
+        self.record.save()
         self.assertIn('quux.example.com', self.zone.records)

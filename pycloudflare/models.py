@@ -120,30 +120,36 @@ class Zone(object):
 
 
 class ZoneSettings(object):
-    _settings = ()
-
     def __init__(self, zone):
         self.zone = zone
         self.service = zone.service
+        self._settings = self.service.get_zone_settings(self.zone.id)
+        self._updates = {}
 
     def __getitem__(self, name):
-        self.get_settings()
+        if name in self._updates:
+            return self._updates[name]
         if name in self._settings:
             return self._settings[name]['value']
         raise KeyError()
 
     def __setitem__(self, name, value):
-        self.service.set_zone_setting(self.zone.id, name, value)
-        if self._settings:
-            self._settings[name]['value'] = value
+        if name not in self._settings:
+            raise IndexError('Not a valid setting')
+        if not self._settings[name]['editable']:
+            raise ValueError('Not an editeable setting')
+        self._updates[name] = value
+
+    def save(self):
+        # TODO: Atomic update
+        for name, value in self._updates.iteritems():
+            self.service.set_zone_setting(self.zone.id, name, value)
+        if self._updates:
+            self._settings = self.service.get_zone_settings(self.zone.id)
+            self._updates = {}
 
     def __iter__(self):
-        self.get_settings()
         return iter(sorted(self._settings))
-
-    def get_settings(self):
-        if not self._settings:
-            self._settings = self.service.get_zone_settings(self.zone.id)
 
     def __repr__(self):
         return 'ZoneSettings<%s>' % self.zone.name
@@ -156,20 +162,31 @@ class Record(object):
         self.zone = zone
         self.service = zone.service
         self._data = data
+        self._updates = {}
 
     def __getattr__(self, name):
+        if name in self._updates:
+            return self._updates[name]
         if name in self._data:
             return self._data[name]
         raise AttributeError()
 
     def __setattr__(self, name, value):
-        if name not in self._data:
+        if name in ('zone', 'service', '_data', '_updates'):
             return super(Record, self).__setattr__(name, value)
-        data = {name: value}
-        r = self.service.update_dns_record(self.zone.id, self.id, data)
-        self._data.update(r)
-        if name == 'name':
-            clear_property_cache(self.zone, 'records')
+        if name in self._data:
+            self._updates[name] = value
+        else:
+            raise AttributeError()
+
+    def save(self):
+        if self._updates:
+            r = self.service.update_dns_record(self.zone.id, self.id,
+                                               self._updates)
+            self._data.update(r)
+            if 'name' in self._updates:
+                clear_property_cache(self.zone, 'records')
+            self._updates = {}
 
     def delete(self):
         self.service.delete_dns_record(self.zone.id, self.id)
