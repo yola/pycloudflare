@@ -83,6 +83,15 @@ class ZoneTest(TestCase):
         self.assertIn('always_online', settings)
         self.assertIn(settings['always_online']['value'], ('on', 'off'))
 
+    def test_set_zone_settings(self):
+        settings = self.cf.set_zone_settings(self.zone_id, [
+            {'id': 'always_online', 'value': 'on'},
+            {'id': 'ipv6', 'value': 'on'},
+        ])
+        self.assertIsInstance(settings, list)
+        self.assertIn(settings[0]['id'], ('always_online', 'ipv6'))
+        self.assertEqual(settings[0]['value'], 'on')
+
     def test_get_zone_setting(self):
         setting = self.cf.get_zone_setting(self.zone_id, 'always_online')
         self.assertIn('value', setting)

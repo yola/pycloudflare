@@ -39,13 +39,13 @@ class TestZoneSettings(FakedServiceTestCase):
         self.assertEqual(self.zone.settings['always_online'], 'off')
 
     def test_save_without_changes_is_noop(self):
-        with patch.object(self.zone.service, 'set_zone_setting'):
+        with patch.object(self.zone.service, 'set_zone_settings'):
             self.zone.settings.save()
-            self.assertEqual(self.zone.service.set_zone_setting.call_count, 0)
+            self.assertEqual(self.zone.service.set_zone_settings.call_count, 0)
 
     def test_save_performs_update(self):
         self.zone.settings['always_online'] = 'off'
-        with patch.object(self.zone.service, 'set_zone_setting'):
+        with patch.object(self.zone.service, 'set_zone_settings'):
             self.zone.settings.save()
-            self.zone.service.set_zone_setting.assert_called_with(
-                self.zone.id, 'always_online', 'off')
+            self.zone.service.set_zone_settings.assert_called_with(
+                self.zone.id, [{'id': 'always_online', 'value': 'off'}])

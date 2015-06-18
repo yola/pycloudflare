@@ -60,6 +60,10 @@ class CloudFlareService(HTTPServiceClient):
     def get_zone_settings(self, zone_id):
         return dict(self.iter_zone_settings(zone_id))
 
+    def set_zone_settings(self, zone_id, items):
+        data = {'items': items}
+        return self.patch('zones/%s/settings' % zone_id, data)
+
     def get_zone_setting(self, zone_id, setting):
         return self.get('zones/%s/settings/%s' % (zone_id, setting))
 

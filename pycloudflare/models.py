@@ -141,12 +141,13 @@ class ZoneSettings(object):
         self._updates[name] = value
 
     def save(self):
-        # TODO: Atomic update
-        for name, value in self._updates.iteritems():
-            self.service.set_zone_setting(self.zone.id, name, value)
-        if self._updates:
-            self._settings = self.service.get_zone_settings(self.zone.id)
-            self._updates = {}
+        if not self._updates:
+            return
+        items = [{'id': name, 'value': value}
+                 for name, value in self._updates.iteritems()]
+        self.service.set_zone_settings(self.zone.id, items)
+        self._settings = self.service.get_zone_settings(self.zone.id)
+        self._updates = {}
 
     def __iter__(self):
         return iter(sorted(self._settings))

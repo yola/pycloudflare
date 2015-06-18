@@ -146,9 +146,10 @@ class FakeService(object):
     def get_zone_settings(self, zone_id):
         return deepcopy(self.zones[zone_id]['_settings'])
 
-    def set_zone_setting(self, zone_id, setting, value):
-        self.zones[zone_id]['_settings'][setting]['value'] = value
-        return deepcopy(self.zones[zone_id]['_settings'][setting])
+    def set_zone_settings(self, zone_id, items):
+        for setting in items:
+            self.zones[zone_id]['_settings'][setting['id']].update(setting)
+        return deepcopy(self.zones[zone_id]['_settings'])
 
     def create_dns_record(self, zone_id, data):
         data.update({
