@@ -18,6 +18,9 @@ class UserAttributeTestsMixin(object):
     def test_sets_service_attribute(self):
         self.assertTrue(self.user.service)
 
+    def test_repr_able(self):
+        self.assertEqual(repr(self.user), 'User<foo@example.net>')
+
 
 class TestUserCreate(FakedServiceTestCase, UserAttributeTestsMixin):
     def setUp(self):

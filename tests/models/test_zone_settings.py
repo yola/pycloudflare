@@ -26,6 +26,9 @@ class TestZoneSettings(FakedServiceTestCase):
         with self.assertRaises(KeyError):
             self.zone.settings['nonexistent_setting']
 
+    def test_repr_able(self):
+        self.assertEqual(repr(self.zone.settings), 'ZoneSettings<example.com>')
+
     def test_returns_setting_names_in_iteration(self):
         self.assertEqual(next(iter(self.zone.settings)), 'always_online')
 

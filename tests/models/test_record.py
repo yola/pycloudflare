@@ -45,6 +45,10 @@ class TestCreateRecord(FakedServiceTestCase):
         with self.assertRaises(AttributeError):
             self.record.nonexistent
 
+    def test_repr_able(self):
+        self.assertEqual(
+            repr(self.record), 'Record<bar.example.com 1 IN A 127.0.0.1>')
+
     def test_invalidates_zone_records(self):
         self.assertNotIn('baz.example.com', self.zone.records)
         self.zone.create_record('baz.example.com', 'A', '127.0.0.1')

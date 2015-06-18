@@ -43,6 +43,9 @@ class TestCreateZone(FakedServiceTestCase):
     def test_has_plan(self):
         self.assertIsInstance(self.zone.plan, dict)
 
+    def test_repr_able(self):
+        self.assertEqual(repr(self.zone), 'Zone<example.net>')
+
 
 class TestDeleteZone(FakedServiceTestCase):
     def setUp(self):
