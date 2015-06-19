@@ -125,9 +125,11 @@ class FakeService(object):
         zone.pop('_settings')
         return zone
 
-    def iter_zones(self):
-        for zone in self.zones.itervalues():
-            yield self._clean_zone(zone)
+    def get_zones(self, page=0, per_page=50):
+        def iter_zones():
+            for zone in self.zones.values()[page:page + per_page]:
+                yield self._clean_zone(zone)
+        return list(iter_zones())
 
     def get_zone_by_name(self, name):
         for zone in self.zones.itervalues():
@@ -143,8 +145,9 @@ class FakeService(object):
     def delete_zone(self, zone_id):
         del self.zones[zone_id]
 
-    def get_zone_settings(self, zone_id):
-        return deepcopy(self.zones[zone_id]['_settings'])
+    def get_zone_settings(self, zone_id, page=0, per_page=50):
+        settings = self.zones[zone_id]['_settings'].values()
+        return deepcopy(settings[page:page + per_page])
 
     def set_zone_settings(self, zone_id, items):
         for setting in items:
@@ -165,9 +168,8 @@ class FakeService(object):
         self.zones[zone_id]['_records'].append(data)
         return deepcopy(data)
 
-    def iter_dns_records(self, zone_id):
-        for record in self.zones[zone_id]['_records']:
-            yield deepcopy(record)
+    def get_dns_records(self, zone_id, page=0, per_page=50):
+        return deepcopy(self.zones[zone_id]['_records'][page:page + per_page])
 
     def delete_dns_record(self, zone_id, record_id):
         records = [record for record in self.zones[zone_id]['_records']

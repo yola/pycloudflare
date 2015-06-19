@@ -1,6 +1,12 @@
 from property_caching import cached_property, clear_property_cache
 
+from pycloudflare.pagination import PaginatedServiceCall
 from pycloudflare.services import CloudFlareHostService, CloudFlareService
+
+
+def _paginated(*args, **kwargs):
+    kwargs.setdefault('page_size_param', 'per_page')
+    return PaginatedServiceCall(*args, **kwargs)
 
 
 class User(object):
@@ -52,7 +58,7 @@ class User(object):
         return list(self.iter_zones())
 
     def iter_zones(self):
-        for zone in self.service.iter_zones():
+        for zone in _paginated(self.service.get_zones):
             yield Zone(self, zone)
 
     def get_zone_by_name(self, name):
@@ -87,7 +93,8 @@ class Zone(object):
         return ZoneSettings(self)
 
     def iter_records(self):
-        for record in self.service.iter_dns_records(self.id):
+        for record in _paginated(
+                self.service.get_dns_records, args=(self.id,)):
             yield Record(self, record)
 
     @cached_property
@@ -123,8 +130,14 @@ class ZoneSettings(object):
     def __init__(self, zone):
         self.zone = zone
         self.service = zone.service
-        self._settings = self.service.get_zone_settings(self.zone.id)
+        self._get_settings()
         self._updates = {}
+
+    def _get_settings(self):
+        self._settings = {}
+        for setting in _paginated(
+                self.service.get_zone_settings, args=(self.zone.id,)):
+            self._settings[setting['id']] = setting
 
     def __getattr__(self, name):
         if name in self._updates:
@@ -148,7 +161,7 @@ class ZoneSettings(object):
         items = [{'id': name, 'value': value}
                  for name, value in self._updates.iteritems()]
         self.service.set_zone_settings(self.zone.id, items)
-        self._settings = self.service.get_zone_settings(self.zone.id)
+        self._get_settings()
         self._updates = {}
 
     def __iter__(self):

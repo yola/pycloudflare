@@ -6,6 +6,8 @@ from demands import HTTPServiceError
 from yoconfigurator.base import read_config
 from yoconfig import configure_services
 
+from pycloudflare.pagination import (IndexPaginatedServiceCall,
+                                     PaginatedServiceCall)
 from pycloudflare.services import CloudFlareHostService, CloudFlareService
 
 
@@ -29,8 +31,13 @@ def setUpModule():
 
 def tearDownModule():
     cf = cf_service()
-    for zone in cf.iter_zones():
+    for zone in cf_pagination(cf.get_zones):
         cf.delete_zone(zone['id'])
+
+
+def cf_pagination(*args, **kwargs):
+    kwargs.setdefault('page_size_param', 'per_page')
+    return PaginatedServiceCall(*args, **kwargs)
 
 
 def cf_service():
@@ -57,7 +64,8 @@ class ZoneTest(TestCase):
                 'ttl': 1,
             })
         except HTTPServiceError:
-            for record in cls.cf.iter_dns_records(cls.zone_id):
+            for record in cf_pagination(
+                    cls.cf.get_dns_records, args=(cls.zone_id,)):
                 if record['name'] == 'foo.example.net':
                     break
         cls.record_id = record['id']
@@ -66,8 +74,8 @@ class ZoneTest(TestCase):
     def tearDownClass(cls):
         cls.cf.delete_zone(cls.zone_id)
 
-    def test_iter_zones(self):
-        zone = next(self.cf.iter_zones())
+    def test_get_zones(self):
+        zone = self.cf.get_zones()[0]
         self.assertIsInstance(zone, dict)
 
     def test_get_zone(self):
@@ -80,8 +88,11 @@ class ZoneTest(TestCase):
 
     def test_get_zone_settings(self):
         settings = self.cf.get_zone_settings(self.zone_id)
-        self.assertIn('always_online', settings)
-        self.assertIn(settings['always_online']['value'], ('on', 'off'))
+        for setting in settings:
+            if setting['id'] == 'always_online':
+                self.assertIn(setting['value'], ('on', 'off'))
+                return
+        raise AssertionError('Expected to find always_online setting')
 
     def test_set_zone_settings(self):
         settings = self.cf.set_zone_settings(self.zone_id, [
@@ -132,9 +143,10 @@ class HostZonesTest(TestCase):
     def setUp(self):
         self.cfh = CloudFlareHostService()
 
-    def test_iter_zone_list(self):
+    def test_zone_list(self):
+        zones = IndexPaginatedServiceCall(self.cfh.zone_list)
         try:
-            zone = next(self.cfh.iter_zone_list())
+            zone = next(iter(zones))
         except StopIteration:
             pass
         else:

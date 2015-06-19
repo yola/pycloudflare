@@ -1,5 +1,4 @@
 import logging
-from itertools import count
 from urllib import urlencode
 
 from demands import HTTPServiceClient, HTTPServiceError
@@ -25,25 +24,15 @@ class CloudFlareService(HTTPServiceClient):
         response = super(CloudFlareService, self).post_send(response, **kwargs)
         return response.json()['result']
 
-    def _iter_pages(self, base_url, params=None, page_size=50):
-        base_params = params or {}
-        base_params['per_page'] = page_size
+    def _get_paginated(self, base_url, page=0, per_page=50):
+        params = {
+            'page': page,
+            'per_page': per_page,
+        }
+        return self.get(base_url + '?' + urlencode(params))
 
-        for page in count():
-            params = base_params.copy()
-            params['page'] = page
-            url = base_url + '?' + urlencode(params)
-            batch = self.get(url)
-            for result in batch:
-                yield result
-            if len(batch) < page_size:
-                return
-
-    def iter_zones(self):
-        return self._iter_pages('zones')
-
-    def get_zones(self):
-        return list(self.iter_zones())
+    def get_zones(self, page=0, per_page=50):
+        return self._get_paginated('zones', page, per_page)
 
     def get_zone(self, zone_id):
         return self.get('zones/%s' % zone_id)
@@ -53,12 +42,9 @@ class CloudFlareService(HTTPServiceClient):
         assert len(result) <= 1
         return result[0]
 
-    def iter_zone_settings(self, zone_id):
-        for setting in self._iter_pages('zones/%s/settings' % zone_id):
-            yield setting['id'], setting
-
-    def get_zone_settings(self, zone_id):
-        return dict(self.iter_zone_settings(zone_id))
+    def get_zone_settings(self, zone_id, page=0, per_page=50):
+        url = 'zones/%s/settings' % zone_id
+        return self._get_paginated(url, page, per_page)
 
     def set_zone_settings(self, zone_id, items):
         data = {'items': items}
@@ -83,11 +69,9 @@ class CloudFlareService(HTTPServiceClient):
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)
 
-    def iter_dns_records(self, zone_id):
-        return self._iter_pages('zones/%s/dns_records' % zone_id)
-
-    def get_dns_records(self, zone_id):
-        return list(self.iter_dns_records(zone_id))
+    def get_dns_records(self, zone_id, page=0, per_page=50):
+        url = 'zones/%s/dns_records' % zone_id
+        return self._get_paginated(url, page, per_page)
 
     def get_dns_record(self, zone_id, record_id):
         return self.get('zones/%s/dns_records/%s' % (zone_id, record_id))
@@ -151,9 +135,8 @@ class CloudFlareHostService(HTTPServiceClient):
         }
         return self.post(self.gw, data)
 
-    def iter_zone_list(self, zone_name=None, zone_status=None, sub_id=None,
-                       sub_status=None):
-        limit = 100
+    def zone_list(self, zone_name=None, zone_status=None, sub_id=None,
+                  sub_status=None, offset=0, limit=100):
         data = {
             'act': 'zone_list',
             'limit': limit,
@@ -162,10 +145,4 @@ class CloudFlareHostService(HTTPServiceClient):
             'zone_name': zone_name,
             'zone_status': zone_status,
         }
-        for offset in count(0, limit):
-            data['offset'] = offset
-            zones = self.post(self.gw, data)
-            for zone in zones:
-                yield zone
-            if len(zones) < limit:
-                break
+        return self.post(self.gw, data)
