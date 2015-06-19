@@ -126,16 +126,18 @@ class ZoneSettings(object):
         self._settings = self.service.get_zone_settings(self.zone.id)
         self._updates = {}
 
-    def __getitem__(self, name):
+    def __getattr__(self, name):
         if name in self._updates:
             return self._updates[name]
         if name in self._settings:
             return self._settings[name]['value']
-        raise KeyError()
+        raise AttributeError()
 
-    def __setitem__(self, name, value):
+    def __setattr__(self, name, value):
+        if name in ('zone', 'service', '_settings', '_updates'):
+            return super(ZoneSettings, self).__setattr__(name, value)
         if name not in self._settings:
-            raise IndexError('Not a valid setting')
+            raise AttributeError('Not a valid setting')
         if not self._settings[name]['editable']:
             raise ValueError('Not an editeable setting')
         self._updates[name] = value
