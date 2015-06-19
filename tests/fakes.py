@@ -3,18 +3,16 @@ from uuid import uuid4
 
 
 class FakeHostService(object):
-    users = {
-        'foo@example.net': {
-            'cloudflare_email': 'foo@example.net',
-            'cloudflare_username': 'foo',
-            'unique_id': 'fake unique_id',
-            'user_api_key': 'fake api_key',
-            'user_key': 'fake user_key',
-        },
-    }
-
-    def __init__(self, users=None):
-        self.users = users or FakeHostService.users.copy()
+    def __init__(self):
+        self.users = {
+            'foo@example.net': {
+                'cloudflare_email': 'foo@example.net',
+                'cloudflare_username': 'foo',
+                'unique_id': 'fake unique_id',
+                'user_api_key': 'fake api_key',
+                'user_key': 'fake user_key',
+            },
+        }
 
     def user_create(self, email, password, username=None, unique_id=None):
         self.users.setdefault(email, {
@@ -35,89 +33,87 @@ class FakeHostService(object):
         raise Exception('Not Found')
 
 
-def simple_zone(id_, name, records=False):
-    return id_, {
-        'id': id_,
-        'name': name,
-        'development_mode': 7200,
-        'original_name_servers': [
-            'ns1.originaldnshost.com',
-            'ns2.originaldnshost.com',
-        ],
-        'original_registrar': 'GoDaddy',
-        'original_dnshost': 'NameCheap',
-        'created_on': '2014-01-01T05:20:00.12345Z',
-        'modified_on': '2014-01-01T05:20:00.12345Z',
-        'name_servers': [
-            'tony.ns.cloudflare.com',
-            'woz.ns.cloudflare.com',
-        ],
-        'owner': {
-            'id': '9a7806061c88ada191ed06f989cc3dac',
-            'email': 'user@example.com',
-            'owner_type': 'user',
-        },
-        'permissions': [
-            '#zone:read',
-            '#zone:edit',
-        ],
-        'plan': {
-            'id': '9a7806061c88ada191ed06f989cc3dac',
-            'name': 'Pro Plan',
-            'price': 20,
-            'currency': 'USD',
-            'frequency': 'monthly',
-            'is_subscribed': True,
-            'can_subscribe': True,
-        },
-        'status': 'active',
-        'paused': False,
-        'type': 'full',
-        '_records': [
-            {
-                'id': '9a7806061c88ada191ed06f989cc3dac',
-                'type': 'A',
-                'name': name,
-                'content': '1.2.3.4',
-                'proxiable': True,
-                'proxied': False,
-                'ttl': 120,
-                'locked': False,
-                'zone_id': id_,
-                'zone_name': name,
-                'created_on': '2014-01-01T05:20:00.12345Z',
-                'modified_on': '2014-01-01T05:20:00.12345Z',
-                'data': {},
-            },
-        ] if records else [],
-        '_settings': {
-            'always_online': {
-                'id': 'always_online',
-                'value': 'on',
-                'editable': True,
-                'modified_on': '2014-01-01T05:20:00.12345Z',
-            },
-            'minify': {
-                'id': 'minify',
-                'value': {
-                    'css': 'off',
-                    'html': 'off',
-                    'js': 'off',
-                },
-                'editable': True,
-                'modified_on': '2014-01-01T05:20:00.12345Z',
-            },
-        },
-    }
-
-
 class FakeService(object):
-    zones = dict((
-        simple_zone('9a7806061c88ada191ed06f989cc3dac', 'example.com', True),
-    ))
+    def __init__(self, email, api_key):
+        self.zones = {}
+        self._add_zone('9a7806061c88ada191ed06f989cc3dac', 'example.com', True)
 
-    def __init__(self, email, api_key, zones=None):
-        self.zones = zones or deepcopy(FakeService.zones)
+    def _add_zone(self, id_, name, records=False):
+        zone = {
+            'id': id_,
+            'name': name,
+            'development_mode': 7200,
+            'original_name_servers': [
+                'ns1.originaldnshost.com',
+                'ns2.originaldnshost.com',
+            ],
+            'original_registrar': 'GoDaddy',
+            'original_dnshost': 'NameCheap',
+            'created_on': '2014-01-01T05:20:00.12345Z',
+            'modified_on': '2014-01-01T05:20:00.12345Z',
+            'name_servers': [
+                'tony.ns.cloudflare.com',
+                'woz.ns.cloudflare.com',
+            ],
+            'owner': {
+                'id': '9a7806061c88ada191ed06f989cc3dac',
+                'email': 'user@example.com',
+                'owner_type': 'user',
+            },
+            'permissions': [
+                '#zone:read',
+                '#zone:edit',
+            ],
+            'plan': {
+                'id': '9a7806061c88ada191ed06f989cc3dac',
+                'name': 'Pro Plan',
+                'price': 20,
+                'currency': 'USD',
+                'frequency': 'monthly',
+                'is_subscribed': True,
+                'can_subscribe': True,
+            },
+            'status': 'active',
+            'paused': False,
+            'type': 'full',
+            '_records': [
+                {
+                    'id': '9a7806061c88ada191ed06f989cc3dac',
+                    'type': 'A',
+                    'name': name,
+                    'content': '1.2.3.4',
+                    'proxiable': True,
+                    'proxied': False,
+                    'ttl': 120,
+                    'locked': False,
+                    'zone_id': id_,
+                    'zone_name': name,
+                    'created_on': '2014-01-01T05:20:00.12345Z',
+                    'modified_on': '2014-01-01T05:20:00.12345Z',
+                    'data': {},
+                },
+            ] if records else [],
+            '_settings': {
+                'always_online': {
+                    'id': 'always_online',
+                    'value': 'on',
+                    'editable': True,
+                    'modified_on': '2014-01-01T05:20:00.12345Z',
+                },
+                'minify': {
+                    'id': 'minify',
+                    'value': {
+                        'css': 'off',
+                        'html': 'off',
+                        'js': 'off',
+                    },
+                    'editable': True,
+                    'modified_on': '2014-01-01T05:20:00.12345Z',
+                },
+            },
+        }
+        self.zones[id_] = zone
+        return zone
 
     def _clean_zone(self, zone):
         zone = deepcopy(zone)
@@ -138,8 +134,7 @@ class FakeService(object):
         raise Exception('Not Found')
 
     def create_zone(self, name, jump_start=False):
-        id_, zone = simple_zone(uuid4().hex, name)
-        self.zones[id_] = zone
+        zone = self._add_zone(uuid4().hex, name)
         return self._clean_zone(zone)
 
     def delete_zone(self, zone_id):
