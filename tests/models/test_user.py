@@ -22,6 +22,11 @@ class UserAttributeTestsMixin(object):
         self.assertEqual(repr(self.user), 'User<foo@example.net>')
 
 
+class TestUserInstantiate(FakedServiceTestCase, UserAttributeTestsMixin):
+    def setUp(self):
+        self.user = User(email='foo@example.net', api_key='fake api_key')
+
+
 class TestUserCreate(FakedServiceTestCase, UserAttributeTestsMixin):
     def setUp(self):
         self.user = User.get_or_create('foo@example.net', 'bar', 'foo',
