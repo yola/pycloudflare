@@ -161,3 +161,7 @@ class HostUserTest(TestCase):
         user = self.cfh.user_create(self.email, self.password,
                                     unique_id=self.unique_id)
         self.assertIsInstance(user, dict)
+
+    def test_error_handler(self):
+        with self.assertRaises(HTTPServiceError):
+            self.cfh.user_create('not_an_email_address', None)
