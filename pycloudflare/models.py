@@ -5,8 +5,6 @@ from pycloudflare.services import (
 
 
 class User(object):
-    _host_service = None
-
     def __init__(self, email, api_key, host_api_data=None):
         self.api_key = api_key
         self.email = email
@@ -23,9 +21,7 @@ class User(object):
 
     @classmethod
     def get_host_service(cls):
-        if cls._host_service is None:
-            cls._host_service = CloudFlareHostService()
-        return cls._host_service
+        return CloudFlareHostService()
 
     @classmethod
     def get_service(cls, email, api_key):
