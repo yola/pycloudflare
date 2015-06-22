@@ -1,7 +1,7 @@
 from itertools import count
 
 
-class PaginatedServiceCall(object):
+class PaginatedAPIIterator(object):
     def __init__(self, service_method, args=(), kwargs=None,
                  page_param='page', page_size_param='page_size',
                  page_size=100):
@@ -29,11 +29,11 @@ class PaginatedServiceCall(object):
         return count()
 
 
-class IndexPaginatedServiceCall(PaginatedServiceCall):
+class IndexedAPIIterator(PaginatedAPIIterator):
     def __init__(self, service_method, args=(), kwargs=None,
                  offset_param='offset', limit_param='limit',
                  page_size=100):
-        super(IndexPaginatedServiceCall, self).__init__(
+        super(IndexedAPIIterator, self).__init__(
             service_method, args, kwargs, page_param=offset_param,
             page_size_param=limit_param, page_size=page_size)
 

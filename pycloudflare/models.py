@@ -1,12 +1,12 @@
 from property_caching import cached_property, clear_property_cache
 
-from pycloudflare.pagination import PaginatedServiceCall
+from pycloudflare.pagination import PaginatedAPIIterator
 from pycloudflare.services import CloudFlareHostService, CloudFlareService
 
 
 def _paginated(*args, **kwargs):
     kwargs.setdefault('page_size_param', 'per_page')
-    return PaginatedServiceCall(*args, **kwargs)
+    return PaginatedAPIIterator(*args, **kwargs)
 
 
 class User(object):

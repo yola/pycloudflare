@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from pycloudflare.pagination import (IndexPaginatedServiceCall,
-                                     PaginatedServiceCall)
+from pycloudflare.pagination import IndexedAPIIterator, PaginatedAPIIterator
 
 
 class PagitationTestsMixin(object):
@@ -28,7 +27,7 @@ class PaginationTest(TestCase, PagitationTestsMixin):
             end = start + page_size
             return self.responses[start:end]
 
-        self.psc = PaginatedServiceCall(
+        self.psc = PaginatedAPIIterator(
             get, page_size=10, args=('http://example.net/',))
 
 
@@ -39,5 +38,5 @@ class IndexPaginationTest(TestCase, PagitationTestsMixin):
             end = start + limit
             return self.responses[start:end]
 
-        self.psc = IndexPaginatedServiceCall(
+        self.psc = IndexedAPIIterator(
             get, page_size=10, args=('http://example.net/',))

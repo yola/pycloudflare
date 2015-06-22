@@ -6,8 +6,7 @@ from demands import HTTPServiceError
 from yoconfigurator.base import read_config
 from yoconfig import configure_services
 
-from pycloudflare.pagination import (IndexPaginatedServiceCall,
-                                     PaginatedServiceCall)
+from pycloudflare.pagination import IndexedAPIIterator, PaginatedAPIIterator
 from pycloudflare.services import CloudFlareHostService, CloudFlareService
 
 
@@ -37,7 +36,7 @@ def tearDownModule():
 
 def cf_pagination(*args, **kwargs):
     kwargs.setdefault('page_size_param', 'per_page')
-    return PaginatedServiceCall(*args, **kwargs)
+    return PaginatedAPIIterator(*args, **kwargs)
 
 
 def cf_service():
@@ -144,7 +143,7 @@ class HostZonesTest(TestCase):
         self.cfh = CloudFlareHostService()
 
     def test_zone_list(self):
-        zones = IndexPaginatedServiceCall(self.cfh.zone_list)
+        zones = IndexedAPIIterator(self.cfh.zone_list)
         try:
             zone = next(iter(zones))
         except StopIteration:
