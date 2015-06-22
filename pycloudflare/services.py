@@ -4,8 +4,14 @@ from urllib import urlencode
 from demands import HTTPServiceClient, HTTPServiceError
 from yoconfig import get_config
 
+from pycloudflare.pagination import IndexedAPIIterator, PaginatedAPIIterator
 
 log = logging.getLogger(__name__)
+
+
+class CloudFlarePageIterator(PaginatedAPIIterator):
+    page_size_param = 'per_page'
+    page_size = 50
 
 
 class CloudFlareService(HTTPServiceClient):
@@ -24,14 +30,15 @@ class CloudFlareService(HTTPServiceClient):
         response = super(CloudFlareService, self).post_send(response, **kwargs)
         return response.json()['result']
 
-    def _get_paginated(self, base_url, page=0, per_page=50):
+    def _get_paginated(self, base_url, page=0,
+                       per_page=CloudFlarePageIterator.page_size):
         params = {
             'page': page,
             'per_page': per_page,
         }
         return self.get(base_url + '?' + urlencode(params))
 
-    def get_zones(self, page=0, per_page=50):
+    def get_zones(self, page=0, per_page=CloudFlarePageIterator.page_size):
         return self._get_paginated('zones', page, per_page)
 
     def get_zone(self, zone_id):
@@ -42,7 +49,8 @@ class CloudFlareService(HTTPServiceClient):
         assert len(result) <= 1
         return result[0]
 
-    def get_zone_settings(self, zone_id, page=0, per_page=50):
+    def get_zone_settings(self, zone_id, page=0,
+                          per_page=CloudFlarePageIterator.page_size):
         url = 'zones/%s/settings' % zone_id
         return self._get_paginated(url, page, per_page)
 
@@ -69,7 +77,8 @@ class CloudFlareService(HTTPServiceClient):
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)
 
-    def get_dns_records(self, zone_id, page=0, per_page=50):
+    def get_dns_records(self, zone_id, page=0,
+                        per_page=CloudFlarePageIterator.page_size):
         url = 'zones/%s/dns_records' % zone_id
         return self._get_paginated(url, page, per_page)
 
@@ -85,6 +94,12 @@ class CloudFlareService(HTTPServiceClient):
 
     def delete_dns_record(self, zone_id, record_id):
         return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))
+
+
+class CloudFlareHostPageIterator(IndexedAPIIterator):
+    page_param = 'offset'
+    page_size_param = 'limit'
+    page_size = 100
 
 
 class CloudFlareHostService(HTTPServiceClient):
@@ -136,7 +151,8 @@ class CloudFlareHostService(HTTPServiceClient):
         return self.post(self.gw, data)
 
     def zone_list(self, zone_name=None, zone_status=None, sub_id=None,
-                  sub_status=None, offset=0, limit=100):
+                  sub_status=None, offset=0,
+                  limit=CloudFlareHostPageIterator.page_size):
         data = {
             'act': 'zone_list',
             'limit': limit,

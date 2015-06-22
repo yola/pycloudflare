@@ -1,12 +1,7 @@
 from property_caching import cached_property, clear_property_cache
 
-from pycloudflare.pagination import PaginatedAPIIterator
-from pycloudflare.services import CloudFlareHostService, CloudFlareService
-
-
-def _paginated(*args, **kwargs):
-    kwargs.setdefault('page_size_param', 'per_page')
-    return PaginatedAPIIterator(*args, **kwargs)
+from pycloudflare.services import (
+    CloudFlareHostService, CloudFlarePageIterator, CloudFlareService)
 
 
 class User(object):
@@ -58,7 +53,7 @@ class User(object):
         return list(self.iter_zones())
 
     def iter_zones(self):
-        for zone in _paginated(self.service.get_zones):
+        for zone in CloudFlarePageIterator(self.service.get_zones):
             yield Zone(self, zone)
 
     def get_zone_by_name(self, name):
@@ -93,7 +88,7 @@ class Zone(object):
         return ZoneSettings(self)
 
     def iter_records(self):
-        for record in _paginated(
+        for record in CloudFlarePageIterator(
                 self.service.get_dns_records, args=(self.id,)):
             yield Record(self, record)
 
@@ -135,7 +130,7 @@ class ZoneSettings(object):
 
     def _get_settings(self):
         self._settings = {}
-        for setting in _paginated(
+        for setting in CloudFlarePageIterator(
                 self.service.get_zone_settings, args=(self.zone.id,)):
             self._settings[setting['id']] = setting
 

@@ -28,7 +28,8 @@ class PaginationTest(TestCase, PagitationTestsMixin):
             return self.responses[start:end]
 
         self.psc = PaginatedAPIIterator(
-            get, page_size=10, args=('http://example.net/',))
+            get, args=('http://example.net/',))
+        self.psc.page_size = 10
 
 
 class IndexPaginationTest(TestCase, PagitationTestsMixin):
@@ -39,4 +40,7 @@ class IndexPaginationTest(TestCase, PagitationTestsMixin):
             return self.responses[start:end]
 
         self.psc = IndexedAPIIterator(
-            get, page_size=10, args=('http://example.net/',))
+            get, args=('http://example.net/',))
+        self.psc.page_size = 10
+        self.psc.page_param = 'offset'
+        self.psc.page_size_param = 'limit'
