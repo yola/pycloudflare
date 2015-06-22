@@ -188,9 +188,9 @@ class Record(object):
 
     def save(self):
         if self._updates:
-            r = self.service.update_dns_record(self.zone.id, self.id,
-                                               self._updates)
-            self._data.update(r)
+            result = self.service.update_dns_record(self.zone.id, self.id,
+                                                    self._updates)
+            self._data.update(result)
             if 'name' in self._updates:
                 clear_property_cache(self.zone, 'records')
             self._updates = {}
