@@ -5,19 +5,10 @@ from pycloudflare.services import (
 
 
 class User(object):
-    def __init__(self, email, api_key, host_api_data=None):
+    def __init__(self, email, api_key):
         self.api_key = api_key
         self.email = email
-        self._host_api_data = host_api_data
         self.service = self.get_service(email, api_key)
-
-    def __getattr__(self, name):
-        if name in ('user_key', 'unique_id'):
-            if not self._host_api_data:
-                service = self.get_host_service()
-                self._host_api_data = service.user_lookup(email=self.email)
-            return self._host_api_data[name]
-        raise AttributeError()
 
     @classmethod
     def get_host_service(cls):
@@ -34,7 +25,7 @@ class User(object):
                                    username=username, unique_id=unique_id)
         api_key = data.pop('user_api_key')
         email = data.pop('cloudflare_email')
-        return User(email, api_key, host_api_data=data)
+        return User(email, api_key)
 
     @classmethod
     def get(cls, email=None, unique_id=None):
@@ -42,7 +33,7 @@ class User(object):
         data = service.user_lookup(email=email, unique_id=unique_id)
         api_key = data.pop('user_api_key')
         email = data.pop('cloudflare_email')
-        return User(email, api_key, host_api_data=data)
+        return User(email, api_key)
 
     @cached_property
     def zones(self):

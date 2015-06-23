@@ -9,12 +9,6 @@ class UserAttributeTestsMixin(object):
     def test_sets_api_key_attribute(self):
         self.assertEqual(self.user.api_key, 'fake api_key')
 
-    def test_sets_user_key_attribute(self):
-        self.assertEqual(self.user.user_key, 'fake user_key')
-
-    def test_sets_usique_id_attribute(self):
-        self.assertEqual(self.user.unique_id, 'fake unique_id')
-
     def test_sets_service_attribute(self):
         self.assertTrue(self.user.service)
 
