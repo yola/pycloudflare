@@ -30,8 +30,7 @@ class CloudFlareService(HTTPServiceClient):
         response = super(CloudFlareService, self).post_send(response, **kwargs)
         return response.json()['result']
 
-    def _get_paginated(self, base_url, page=0,
-                       per_page=CloudFlarePageIterator.page_size):
+    def _get_paginated(self, base_url, page, per_page):
         params = {
             'page': page,
             'per_page': per_page,
