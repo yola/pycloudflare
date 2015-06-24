@@ -5,6 +5,7 @@ class PaginatedAPIIterator(object):
     page_param = 'page'
     page_size_param = 'page_size'
     page_size = 100
+    pagination_type = 'page'
 
     def __init__(self, service_method, args=(), kwargs=None):
         self.service_method = service_method
@@ -24,9 +25,8 @@ class PaginatedAPIIterator(object):
                 return
 
     def page_ids(self):
-        return count()
-
-
-class IndexedAPIIterator(PaginatedAPIIterator):
-    def page_ids(self):
-        return count(0, self.page_size)
+        if self.pagination_type == 'page':
+            return count()
+        elif self.pagination_type == 'item':
+            return count(0, self.page_size)
+        raise ValueError('Unknown pagination_type')

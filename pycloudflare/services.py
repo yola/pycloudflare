@@ -4,7 +4,7 @@ from urllib import urlencode
 from demands import HTTPServiceClient, HTTPServiceError
 from yoconfig import get_config
 
-from pycloudflare.pagination import IndexedAPIIterator, PaginatedAPIIterator
+from pycloudflare.pagination import PaginatedAPIIterator
 
 log = logging.getLogger(__name__)
 
@@ -95,10 +95,11 @@ class CloudFlareService(HTTPServiceClient):
         return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))
 
 
-class CloudFlareHostPageIterator(IndexedAPIIterator):
+class CloudFlareHostPageIterator(PaginatedAPIIterator):
     page_param = 'offset'
     page_size_param = 'limit'
     page_size = 100
+    pagination_type = 'item'
 
 
 class CloudFlareHostService(HTTPServiceClient):
