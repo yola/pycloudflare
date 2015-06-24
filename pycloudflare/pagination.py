@@ -9,11 +9,11 @@ class PaginatedAPIIterator(object):
     def __init__(self, service_method, args=(), kwargs=None):
         self.service_method = service_method
         self.args = args
-        self.kwargs = kwargs or {}
+        self.kwargs = (kwargs or {}).copy()
 
     def __iter__(self):
         for page in self.page_ids():
-            kwargs = self.kwargs.copy()
+            kwargs = self.kwargs
             kwargs[self.page_param] = page
             kwargs[self.page_size_param] = self.page_size
 
