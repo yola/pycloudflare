@@ -21,11 +21,8 @@ class User(object):
     @classmethod
     def get_or_create(cls, email, password, username=None, unique_id=None):
         service = cls.get_host_service()
-        data = service.user_create(email=email, password=password,
-                                   username=username, unique_id=unique_id)
-        api_key = data.pop('user_api_key')
-        email = data.pop('cloudflare_email')
-        return User(email, api_key)
+        data = service.user_create(email, password, username, unique_id)
+        return User(data['cloudflare_email'], data['user_api_key'])
 
     @classmethod
     def get(cls, email=None, unique_id=None):
@@ -83,8 +80,7 @@ class Zone(object):
     def records(self):
         by_name = {}
         for record in self.iter_records():
-            by_name.setdefault(record.name, [])
-            by_name[record.name].append(record)
+            by_name.setdefault(record.name, []).append(record)
         return by_name
 
     def create_record(self, name, type, content, ttl=1, proxied=False,
