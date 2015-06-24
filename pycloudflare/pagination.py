@@ -15,8 +15,7 @@ class PaginatedAPIIterator(object):
         for page in self.page_ids():
             kwargs = self.kwargs.copy()
             kwargs[self.page_param] = page
-            if self.page_size_param:
-                kwargs[self.page_size_param] = self.page_size
+            kwargs[self.page_size_param] = self.page_size
 
             batch = self.service_method(*self.args, **kwargs)
             for result in batch:
