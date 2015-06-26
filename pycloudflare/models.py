@@ -84,7 +84,7 @@ class Zone(object):
         return by_name
 
     def create_record(self, name, type, content, ttl=1, proxied=False,
-                      **kwargs):
+                      priority=None):
         data = {
             'name': name,
             'type': type,
@@ -93,8 +93,7 @@ class Zone(object):
             'proxied': proxied,
         }
         if type == 'MX':
-            data['priority'] = kwargs.pop('priority')
-        assert kwargs == {}
+            data['priority'] = priority or 10
 
         record = self.service.create_dns_record(self.id, data)
         clear_property_cache(self, 'records')

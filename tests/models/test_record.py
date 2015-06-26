@@ -62,11 +62,7 @@ class TestCreateMXRecord(FakedServiceTestCase):
         self.user = User.get(email='foo@example.net')
         self.zone = self.user.get_zone_by_name('example.com')
 
-    def test_fails_without_priority(self):
-        with self.assertRaises(Exception):
-            self.zone.create_record('bar.example.com', 'MX', 'mail.net')
-
-    def test_successeds_with_priority(self):
+    def test_sets_priority(self):
         record = self.zone.create_record('bar.example.com', 'MX', 'mail.net',
                                          priority=10)
         self.assertEqual(record.priority, 10)
