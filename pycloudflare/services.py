@@ -67,7 +67,7 @@ class CloudFlareService(HTTPServiceClient):
             'jump_start': jump_start,
         }
         if organization:
-            data['organization'] = {'id': self._organization}
+            data['organization'] = {'id': organization}
         return self.post('zones', data)
 
     def delete_zone(self, zone_id):

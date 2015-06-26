@@ -44,8 +44,9 @@ class User(object):
         zone = self.service.get_zone_by_name(name)
         return Zone(self, zone)
 
-    def create_zone(self, name, jump_start=False):
-        zone = self.service.create_zone(name=name, jump_start=jump_start)
+    def create_zone(self, name, jump_start=False, organization=None):
+        zone = self.service.create_zone(name=name, jump_start=jump_start,
+                                        organization=organization)
         return Zone(self, zone)
 
     def __repr__(self):

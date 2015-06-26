@@ -133,7 +133,7 @@ class FakeService(object):
                 return self._clean_zone(zone)
         raise Exception('Not Found')
 
-    def create_zone(self, name, jump_start=False):
+    def create_zone(self, name, jump_start=False, organization=None):
         zone = self._add_zone(uuid4().hex, name)
         return self._clean_zone(zone)
 
