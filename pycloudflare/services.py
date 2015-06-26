@@ -1,12 +1,9 @@
-import logging
 from urllib import urlencode
 
 from demands import HTTPServiceClient, HTTPServiceError
 from yoconfig import get_config
 
 from pycloudflare.pagination import PaginatedAPIIterator
-
-log = logging.getLogger(__name__)
 
 
 class CloudFlarePageIterator(PaginatedAPIIterator):
@@ -120,13 +117,6 @@ class CloudFlareHostService(HTTPServiceClient):
             response, **kwargs)
         response_json = response.json()
         if response_json['result'] == 'error':
-            err_code = response_json['err_code']
-            msg = response_json['msg']
-            data = kwargs['data'].copy()
-            data.pop('host_key')
-            act = data.pop('act')
-            log.error('Error response %s: %s from %s with %r',
-                      err_code, msg, act, data)
             raise HTTPServiceError(response)
         return response_json['response']
 
