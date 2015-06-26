@@ -82,6 +82,8 @@ class Zone(object):
         by_name = {}
         for record in self.iter_records():
             by_name.setdefault(record.name, []).append(record)
+        for value in by_name.itervalues():
+            value.sort(key=lambda r: (r.type, r.content))
         return by_name
 
     def create_record(self, name, type, content, ttl=1, proxied=False,
