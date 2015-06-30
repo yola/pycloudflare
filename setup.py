@@ -9,6 +9,7 @@ setup(
     description=pycloudflare.__doc__,
     author='Yola',
     author_email='engineers@yola.com',
+    license='MIT (Expat)',
     url=pycloudflare.__url__,
     packages=['pycloudflare'],
     test_suite='nose.collector',
