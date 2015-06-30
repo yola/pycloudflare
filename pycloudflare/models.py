@@ -87,7 +87,7 @@ class Zone(object):
         return by_name
 
     def create_record(self, name, type, content, ttl=1, proxied=False,
-                      priority=None):
+                      priority=10):
         data = {
             'name': name,
             'type': type,
@@ -96,7 +96,7 @@ class Zone(object):
             'proxied': proxied,
         }
         if type == 'MX':
-            data['priority'] = priority or 10
+            data['priority'] = priority
 
         record = self.service.create_dns_record(self.id, data)
         clear_property_cache(self, 'records')
