@@ -13,13 +13,12 @@ class CloudFlarePageIterator(PaginatedAPIIterator):
 
 class CloudFlareService(HTTPServiceClient):
     def __init__(self, api_key, email):
-        config = get_config('cloudflare')
         headers = {
             'Content-Type': 'application/json',
             'X-Auth-Key': api_key,
             'X-Auth-Email': email,
         }
-        url = config['url'] + 'client/v4/'
+        url = 'https://api.cloudflare.com/client/v4/'
         super(CloudFlareService, self).__init__(
             url, headers=headers, send_as_json=True)
 
@@ -105,8 +104,9 @@ class CloudFlareHostService(HTTPServiceClient):
         data = {
             'host_key': config['api_key'],
         }
+        url = 'https://api.cloudflare.com/'
         self.gw = 'host-gw.html'
-        super(CloudFlareHostService, self).__init__(config['url'], data=data)
+        super(CloudFlareHostService, self).__init__(url, data=data)
 
     def post_send(self, response, **kwargs):
         """
