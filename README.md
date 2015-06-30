@@ -15,8 +15,8 @@ Get all our zones at CloudFlare
 
 ## Configuration
 
-The service client is configured when it is instantiated and reads its
-configuration from `yoconfig`:
+The Host API service client is configured when it is instantiated and
+reads its configuration from `yoconfig`:
 
 Django (or other) applications wishing to configure the service client,
 can use `yoconfig.configure_services`.
@@ -26,9 +26,7 @@ from yoconfig import configure_services
 
 configure_services('application_name', ['cloudflare'], {
     'cloudflare': {
-        'url': 'https://api.cloudflare.com/client/v4/',
         'api_key': '<api_key>',
-        'email': '<email_addres>'
     },
 })
 ```
