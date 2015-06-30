@@ -1,10 +1,7 @@
-import os
 from unittest import TestCase
 from uuid import uuid4
 
 from demands import HTTPServiceError
-from yoconfigurator.base import read_config
-from yoconfig import configure_services
 
 from pycloudflare.services import (
     CloudFlareHostPageIterator, CloudFlareHostService, CloudFlarePageIterator,
@@ -15,10 +12,6 @@ TEST_USER = {}
 
 
 def setUpModule():
-    app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    conf = read_config(app_dir)
-    configure_services('cloudflare', ['cloudflare'], conf.common)
-
     cfh = CloudFlareHostService()
     TEST_USER['password'] = uuid4().hex
     TEST_USER['unique_id'] = uuid4().hex
