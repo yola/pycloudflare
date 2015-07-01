@@ -1,8 +1,8 @@
 from urllib import urlencode
 
 from demands import HTTPServiceClient, HTTPServiceError
-from yoconfig import get_config
 
+from pycloudflare.config import get_config
 from pycloudflare.pagination import PaginatedAPIIterator
 
 
@@ -100,7 +100,7 @@ class CloudFlareHostPageIterator(PaginatedAPIIterator):
 
 class CloudFlareHostService(HTTPServiceClient):
     def __init__(self, **kwargs):
-        config = get_config('cloudflare')
+        config = get_config()
         data = {
             'host_key': config['api_key'],
         }

@@ -15,20 +15,19 @@ Get all our zones at CloudFlare
 
 ## Configuration
 
-The Host API service client is configured when it is instantiated and
-reads its configuration from `yoconfig`:
+The Host (Partner) API service client is configured when it is
+instantiated and reads its configuration from `configuration.json`.
 
-Django (or other) applications wishing to configure the service client,
-can use `yoconfig.configure_services`.
+The configuration file should be in the format:
 
-```python
-from yoconfig import configure_services
-
-configure_services('application_name', ['cloudflare'], {
-    'cloudflare': {
-        'api_key': '<api_key>',
-    },
-})
+```json
+{
+    "common": {
+        "cloudflare": {
+            "api_key": "HOST API KEY HERE",
+         }
+    }
+}
 ```
 
 ## Testing
@@ -40,3 +39,7 @@ Install development requirements:
 Tests can then be run by doing:
 
     nosetests
+
+The integration tests require a host API key. They can be run with:
+
+    nosetests tests/test_integration.py
