@@ -1,6 +1,8 @@
 from copy import deepcopy
 from uuid import uuid4
 
+from six import itervalues
+
 
 class FakeHostService(object):
     def __init__(self):
@@ -27,7 +29,7 @@ class FakeHostService(object):
     def user_lookup(self, email=None, unique_id=None):
         if email:
             return self.users[email].copy()
-        for user in self.users.itervalues():
+        for user in itervalues(self.users):
             if unique_id == user.get('unique_id'):
                 return user.copy()
         raise Exception('Not Found')
@@ -123,12 +125,12 @@ class FakeService(object):
 
     def get_zones(self, page=0, per_page=50):
         def iter_zones():
-            for zone in self.zones.values()[page:page + per_page]:
+            for zone in list(self.zones.values())[page:page + per_page]:
                 yield self._clean_zone(zone)
         return list(iter_zones())
 
     def get_zone_by_name(self, name):
-        for zone in self.zones.itervalues():
+        for zone in itervalues(self.zones):
             if zone['name'] == name:
                 return self._clean_zone(zone)
         raise Exception('Not Found')
@@ -141,7 +143,7 @@ class FakeService(object):
         del self.zones[zone_id]
 
     def get_zone_settings(self, zone_id, page=0, per_page=50):
-        settings = self.zones[zone_id]['_settings'].values()
+        settings = list(self.zones[zone_id]['_settings'].values())
         return deepcopy(settings[page:page + per_page])
 
     def set_zone_settings(self, zone_id, items):
