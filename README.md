@@ -1,6 +1,8 @@
 pycloudflare
 ============
 
+[![Build Status](https://travis-ci.org/yola/pycloudflare.svg)](https://travis-ci.org/yola/pycloudflare)
+
 A Python client for CloudFlare
 
 ## Usage
