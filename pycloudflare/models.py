@@ -1,4 +1,5 @@
 from property_caching import cached_property, clear_property_cache
+from six import iteritems, itervalues
 
 from pycloudflare.services import (
     CloudFlareHostService, CloudFlarePageIterator, CloudFlareService)
@@ -82,7 +83,7 @@ class Zone(object):
         by_name = {}
         for record in self.iter_records():
             by_name.setdefault(record.name, []).append(record)
-        for value in by_name.itervalues():
+        for value in itervalues(by_name):
             value.sort(key=lambda r: (r.type, r.content))
         return by_name
 
@@ -139,7 +140,7 @@ class ZoneSettings(object):
         if not self._updates:
             return
         items = [{'id': name, 'value': value}
-                 for name, value in self._updates.iteritems()]
+                 for name, value in iteritems(self._updates)]
         self.service.set_zone_settings(self.zone.id, items)
         self._get_settings()
         self._updates = {}

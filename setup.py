@@ -16,5 +16,6 @@ setup(
     install_requires=[
         'demands >= 1.0.5, < 2.0.0',
         'property-caching >= 1.0.0, < 2.0.0',
+        'six >= 1.4.0, < 2.0.0',
     ]
 )

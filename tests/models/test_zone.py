@@ -1,3 +1,5 @@
+from six import string_types
+
 from pycloudflare.models import Record, User, Zone
 from tests.models import FakedServiceTestCase
 
@@ -14,7 +16,7 @@ class TestCreateZone(FakedServiceTestCase):
         self.assertEqual(self.zone.name, 'example.net')
 
     def test_has_id(self):
-        self.assertIsInstance(self.zone.id, basestring)
+        self.assertIsInstance(self.zone.id, string_types)
 
     def test_has_name_servers(self):
         self.assertEqual(self.zone.name_servers,

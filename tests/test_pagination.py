@@ -5,17 +5,17 @@ from pycloudflare.pagination import PaginatedAPIIterator
 
 class PagitationTestsMixin(object):
     def test_iterate_one_undersized_page(self):
-        self.responses = range(5)
+        self.responses = list(range(5))
         r = list(self.psc)
         self.assertEqual(r, self.responses)
 
     def test_iterate_multiple_full_pages(self):
-        self.responses = range(20)
+        self.responses = list(range(20))
         r = list(self.psc)
         self.assertEqual(r, self.responses)
 
     def test_iterate_multiple_pages(self):
-        self.responses = range(25)
+        self.responses = list(range(25))
         r = list(self.psc)
         self.assertEqual(r, self.responses)
 

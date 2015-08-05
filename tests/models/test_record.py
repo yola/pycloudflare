@@ -1,4 +1,5 @@
 from mock import patch
+from six import string_types
 
 from pycloudflare.models import Record, User
 from tests.models import FakedServiceTestCase
@@ -15,7 +16,7 @@ class TestCreateRecord(FakedServiceTestCase):
         self.assertIsInstance(self.record, Record)
 
     def test_has_id_attribute(self):
-        self.assertIsInstance(self.record.id, basestring)
+        self.assertIsInstance(self.record.id, string_types)
 
     def test_has_type_attribute(self):
         self.assertEqual(self.record.type, 'A')

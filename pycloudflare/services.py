@@ -1,6 +1,5 @@
-from urllib import urlencode
-
 from demands import HTTPServiceClient, HTTPServiceError
+from six.moves.urllib.parse import urlencode
 
 from pycloudflare.config import get_config
 from pycloudflare.pagination import PaginatedAPIIterator
