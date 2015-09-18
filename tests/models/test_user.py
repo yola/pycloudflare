@@ -6,9 +6,6 @@ class UserAttributeTestsMixin(object):
     def test_sets_email_attribute(self):
         self.assertEqual(self.user.email, 'foo@example.net')
 
-    def test_sets_api_key_attribute(self):
-        self.assertEqual(self.user.api_key, 'fake api_key')
-
     def test_sets_service_attribute(self):
         self.assertTrue(self.user.service)
 

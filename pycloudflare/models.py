@@ -9,7 +9,6 @@ from pycloudflare.services import (
 class User(object):
     def __init__(self, email, api_key):
         self.email = email
-        self.api_key = api_key
         self.service = self.get_service(api_key, email)
 
     @classmethod
@@ -24,28 +23,28 @@ class User(object):
     def get_or_create(cls, email, password, username=None, unique_id=None):
         service = cls.get_host_service()
         data = service.user_create(email, password, username, unique_id)
-        return cls.create_from_api_response(data)
+        return cls.create_from_host_api_response(data)
 
     @classmethod
     def get(cls, email=None, unique_id=None):
         service = cls.get_host_service()
         data = service.user_lookup(email=email, unique_id=unique_id)
-        return cls.create_from_api_response(data)
+        return cls.create_from_host_api_response(data)
 
     @classmethod
-    def create_from_api_response(cls, data):
+    def create_from_host_api_response(cls, data):
         user = User(data['cloudflare_email'], data['user_api_key'])
         set_property_cache(user, 'data', data)
         return user
 
     @cached_property
-    def data(self):
+    def host_api_data(self):
         service = self.get_host_service()
         return service.user_lookup(email=self.email)
 
     @property
     def user_key(self):
-        return self.data['user_key']
+        return self.host_api_data['user_key']
 
     @cached_property
     def zones(self):
