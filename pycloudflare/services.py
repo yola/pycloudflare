@@ -139,7 +139,7 @@ class CloudFlareHostService(HTTPServiceClient):
         }
         return self.post(self.gw, data)
 
-    def full_zone_set(self, zone_name, user_key, jumpstart=False):
+    def create_user_zone(self, zone_name, user_key, jumpstart=False):
         data = {
             'act': 'full_zone_set',
             'jumpstart': int(jumpstart),

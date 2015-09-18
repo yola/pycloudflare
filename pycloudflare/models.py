@@ -48,7 +48,7 @@ class User(object):
     def create_partner_zone(self, name, jump_start=False):
         host_service = self.get_host_service()
         user_key = host_service.user_lookup(email=self.email)['user_key']
-        host_service.full_zone_set(name, user_key, jump_start)
+        host_service.create_user_zone(name, user_key, jump_start)
         return self.get_zone_by_name(name)
 
     def create_zone(self, name, jump_start=False, organization=None):
