@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+* Rename `create_partner_zone` to `create_host_zone`
+* Cleanup garbage records created for `full_zone_set`
+
 ## 0.1.0
 
 * Add ability to create partner zone (both to service and model)
