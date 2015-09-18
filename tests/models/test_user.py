@@ -23,6 +23,9 @@ class TestUserCreate(FakedServiceTestCase, UserAttributeTestsMixin):
         self.user = User.get_or_create('foo@example.net', 'bar', 'foo',
                                        'fake unique_id')
 
+    def test_has_user_key(self):
+        self.assertEqual(self.user.user_key, 'fake user_key')
+
 
 class TestUserGet(FakedServiceTestCase, UserAttributeTestsMixin):
     def setUp(self):
