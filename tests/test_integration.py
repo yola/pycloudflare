@@ -142,8 +142,7 @@ class HostZonesTest(TestCase):
             self.assertIsInstance(zone, dict)
 
     def test_full_zone_set(self):
-        response = self.cfh.create_user_zone(
-            'example.org', self.user['user_key'])
+        response = self.cfh.full_zone_set('example.org', self.user['user_key'])
         self.assertIsInstance(response, dict)
 
 

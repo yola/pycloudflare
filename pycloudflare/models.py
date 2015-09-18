@@ -39,10 +39,15 @@ class User(object):
         zone = self.service.get_zone_by_name(name)
         return Zone(self, zone)
 
-    def create_zone(self, name, jump_start=False):
+    def create_partner_zone(self, name, jump_start=False):
         host_service = self.get_host_service()
-        host_service.create_user_zone(name, self.user_key, jump_start)
+        host_service.full_zone_set(name, self.user_key, jump_start)
         return self.get_zone_by_name(name)
+
+    def create_zone(self, name, jump_start=False, organization=None):
+        zone = self.service.create_zone(name=name, jump_start=jump_start,
+                                        organization=organization)
+        return Zone(self, zone)
 
     def __repr__(self):
         return 'User<%s>' % self.email
