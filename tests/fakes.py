@@ -36,7 +36,7 @@ class FakeHostService(object):
 
 
 class FakeService(object):
-    def __init__(self, email, api_key):
+    def __init__(self, api_key, email):
         self.zones = {}
         self._add_zone('9a7806061c88ada191ed06f989cc3dac', 'example.com', True)
 

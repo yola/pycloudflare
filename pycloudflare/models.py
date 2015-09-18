@@ -1,4 +1,5 @@
-from property_caching import cached_property, clear_property_cache
+from property_caching import (
+    cached_property, clear_property_cache, set_property_cache)
 from six import iteritems, itervalues
 
 from pycloudflare.services import (
@@ -7,31 +8,43 @@ from pycloudflare.services import (
 
 class User(object):
     def __init__(self, email, api_key):
-        self.api_key = api_key
         self.email = email
-        self.service = self.get_service(email, api_key)
+        self.service = self.get_service(api_key, email)
 
     @classmethod
     def get_host_service(cls):
         return CloudFlareHostService()
 
     @classmethod
-    def get_service(cls, email, api_key):
-        return CloudFlareService(email=email, api_key=api_key)
+    def get_service(cls, api_key, email):
+        return CloudFlareService(api_key, email)
 
     @classmethod
     def get_or_create(cls, email, password, username=None, unique_id=None):
         service = cls.get_host_service()
         data = service.user_create(email, password, username, unique_id)
-        return User(data['cloudflare_email'], data['user_api_key'])
+        return cls.create_from_host_api_response(data)
 
     @classmethod
     def get(cls, email=None, unique_id=None):
         service = cls.get_host_service()
         data = service.user_lookup(email=email, unique_id=unique_id)
-        api_key = data.pop('user_api_key')
-        email = data.pop('cloudflare_email')
-        return User(email, api_key)
+        return cls.create_from_host_api_response(data)
+
+    @classmethod
+    def create_from_host_api_response(cls, data):
+        user = User(data['cloudflare_email'], data['user_api_key'])
+        set_property_cache(user, '_host_api_data', data)
+        return user
+
+    @cached_property
+    def _host_api_data(self):
+        service = self.get_host_service()
+        return service.user_lookup(email=self.email)
+
+    @property
+    def user_key(self):
+        return self._host_api_data['user_key']
 
     @cached_property
     def zones(self):
@@ -44,6 +57,11 @@ class User(object):
     def get_zone_by_name(self, name):
         zone = self.service.get_zone_by_name(name)
         return Zone(self, zone)
+
+    def create_partner_zone(self, name, jump_start=False):
+        host_service = self.get_host_service()
+        host_service.full_zone_set(name, self.user_key, jump_start)
+        return self.get_zone_by_name(name)
 
     def create_zone(self, name, jump_start=False, organization=None):
         zone = self.service.create_zone(name=name, jump_start=jump_start,

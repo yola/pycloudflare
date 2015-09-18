@@ -139,6 +139,15 @@ class CloudFlareHostService(HTTPServiceClient):
         }
         return self.post(self.gw, data)
 
+    def full_zone_set(self, zone_name, user_key, jumpstart=False):
+        data = {
+            'act': 'full_zone_set',
+            'jumpstart': int(jumpstart),
+            'user_key': user_key,
+            'zone_name': zone_name,
+        }
+        return self.post(self.gw, data)
+
     def zone_list(self, zone_name=None, zone_status=None, sub_id=None,
                   sub_status=None, offset=0,
                   limit=CloudFlareHostPageIterator.page_size):
