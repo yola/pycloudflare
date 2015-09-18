@@ -34,17 +34,17 @@ class User(object):
     @classmethod
     def create_from_host_api_response(cls, data):
         user = User(data['cloudflare_email'], data['user_api_key'])
-        set_property_cache(user, 'data', data)
+        set_property_cache(user, '_host_api_data', data)
         return user
 
     @cached_property
-    def host_api_data(self):
+    def _host_api_data(self):
         service = self.get_host_service()
         return service.user_lookup(email=self.email)
 
     @property
     def user_key(self):
-        return self.host_api_data['user_key']
+        return self._host_api_data['user_key']
 
     @cached_property
     def zones(self):
