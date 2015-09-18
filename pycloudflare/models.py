@@ -16,8 +16,8 @@ class User(object):
         return CloudFlareHostService()
 
     @classmethod
-    def get_service(cls, email, api_key):
-        return CloudFlareService(email=email, api_key=api_key)
+    def get_service(cls, api_key, email):
+        return CloudFlareService(api_key, email)
 
     @classmethod
     def get_or_create(cls, email, password, username=None, unique_id=None):
