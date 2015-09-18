@@ -130,6 +130,7 @@ class ZoneTest(TestCase):
 class HostZonesTest(TestCase):
     def setUp(self):
         self.cfh = CloudFlareHostService()
+        self.user = self.cfh.user_lookup(email=TEST_USER['email'])
 
     def test_zone_list(self):
         zones = CloudFlareHostPageIterator(self.cfh.zone_list)
@@ -139,6 +140,10 @@ class HostZonesTest(TestCase):
             pass
         else:
             self.assertIsInstance(zone, dict)
+
+    def test_full_zone_set(self):
+        response = self.cfh.full_zone_set('example.org', self.user['user_key'])
+        self.assertIsInstance(response, dict)
 
 
 class HostUserTest(TestCase):
