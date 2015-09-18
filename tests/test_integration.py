@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from demands import HTTPServiceError
 
+from pycloudflare.models import User
 from pycloudflare.services import (
     CloudFlareHostPageIterator, CloudFlareHostService, CloudFlarePageIterator,
     CloudFlareService)
@@ -170,3 +171,12 @@ class HostUserTest(TestCase):
     def test_error_handler(self):
         with self.assertRaises(HTTPServiceError):
             self.cfh.user_create('not_an_email_address', None)
+
+
+class CreateHostZoneTest(TestCase):
+    def setUp(self):
+        user = User(TEST_USER['email'], TEST_USER['api_key'])
+        self.zone = user.create_host_zone('example.org')
+
+    def test_creates_zone_without_any_records(self):
+        self.assertEqual(self.zone.records, {})
