@@ -9,15 +9,11 @@ class User(object):
     def __init__(self, data):
         self.email = data['cloudflare_email']
         self.user_key = data['user_key']
-        self.service = self.get_service(self.email, data['user_api_key'])
+        self.service = CloudFlareService(data['user_api_key'], self.email)
 
     @classmethod
     def get_host_service(cls):
         return CloudFlareHostService()
-
-    @classmethod
-    def get_service(cls, email, api_key):
-        return CloudFlareService(email=email, api_key=api_key)
 
     @classmethod
     def get_or_create(cls, email, password, username=None, unique_id=None):
