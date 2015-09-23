@@ -6,7 +6,7 @@ from demands import HTTPServiceError
 from pycloudflare.models import User
 from pycloudflare.services import (
     CloudFlareHostPageIterator, CloudFlareHostService, CloudFlarePageIterator,
-    CloudFlareService)
+    CloudFlareService, ZoneNotFound)
 
 
 TEST_USER = {}
@@ -74,6 +74,9 @@ class ZoneTest(TestCase):
     def test_get_zone_by_name(self):
         zone = self.cf.get_zone_by_name(self.zone_name)
         self.assertEqual(zone['id'], self.zone_id)
+
+    def test_get_zone_by_name_raises_exception(self):
+        self.assertRaises(ZoneNotFound, self.cf.get_zone_by_name, 'foo.bar')
 
     def test_get_zone_settings(self):
         settings = self.cf.get_zone_settings(self.zone_id)

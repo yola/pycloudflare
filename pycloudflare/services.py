@@ -5,6 +5,10 @@ from pycloudflare.config import get_config
 from pycloudflare.pagination import PaginatedAPIIterator
 
 
+class ZoneNotFound(Exception):
+    pass
+
+
 class CloudFlarePageIterator(PaginatedAPIIterator):
     page_size_param = 'per_page'
     page_size = 50
@@ -41,6 +45,9 @@ class CloudFlareService(HTTPServiceClient):
     def get_zone_by_name(self, name):
         result = self.get('zones?' + urlencode({'name': name}))
         assert len(result) <= 1
+        if not result:
+            raise ZoneNotFound()
+
         return result[0]
 
     def get_zone_settings(self, zone_id, page=0,
