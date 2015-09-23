@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2
+
+* Raise `ZoneNotFound` instead of `IndexError` when zone isn't found.
+
 ## 0.1.1
 
 * Rename `create_partner_zone` to `create_host_zone`
