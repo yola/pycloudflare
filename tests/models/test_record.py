@@ -86,10 +86,10 @@ class TestCreateSRVRecord(FakedServiceTestCase):
         self.assertEqual(self.test_record.weight, 5)
 
     def test_sets_service(self):
-        self.assertEqual(self.test_record.service, u'_sip')
+        self.assertEqual(self.test_record.service, '_sip')
 
     def test_sets_protocol(self):
-        self.assertEqual(self.test_record.proto, u'_tcp')
+        self.assertEqual(self.test_record.proto, '_tcp')
 
     def test_sets_port(self):
         self.assertEqual(self.test_record.port, 8806)
