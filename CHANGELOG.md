@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.3
+## 0.2.0
 
 * Add SRV record support to allow for the creation of SRV DNS records.
 * Rename `service` attributes of models to `_service`.
