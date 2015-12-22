@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3
+
+* Add SRV record support to allow for the creation of SRV DNS records.
+* Rename `service` attributes of models to `_service`.
+
 ## 0.1.2
 
 * Raise `ZoneNotFound` instead of `IndexError` when zone isn't found.
