@@ -124,8 +124,7 @@ class Zone(object):
         }
         if type == 'MX':
             data['priority'] = priority
-
-        if type == 'SRV':
+        elif type == 'SRV':
             data.update(
                 service=service,
                 name=name,
