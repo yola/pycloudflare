@@ -74,9 +74,8 @@ class TestCreateSRVRecord(FakedServiceTestCase):
         self.user = User.get(email='foo@example.net')
         self.zone = self.user.get_zone_by_name('example.com')
         self.test_record = self.zone.create_record(
-            'bar.example.com', 'SRV', '',
-            priority=10, weight=5, service='_sip', protocol='_tcp',
-            port=8806, target='example.net'
+            'bar.example.com', 'SRV', priority=10, weight=5,
+            service='_sip', protocol='_tcp', port=8806, target='example.net'
         )
 
     def test_sets_priority(self):

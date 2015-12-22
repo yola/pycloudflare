@@ -5,6 +5,7 @@
 * Add SRV record support to allow for the creation of SRV DNS records.
 * Rename `service` attributes of models to `_service`.
 * Use `record_type` instead of `type` in `create_record` signature.
+* Make `content` parameter to `create_record` optional.
 
 ## 0.1.2
 
