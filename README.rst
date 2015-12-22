@@ -37,21 +37,15 @@ The configuration file should be in the format:
 Testing
 -------
 
-Install development requirements:
-
-::
+Install development requirements::
 
     pip install -r requirements.txt
 
-Tests can then be run by doing:
-
-::
+Tests can then be run by doing::
 
     nosetests
 
-The integration tests require a host API key. They can be run with:
-
-::
+The integration tests require a host API key. They can be run with::
 
     nosetests tests/test_integration.py
 
