@@ -69,6 +69,35 @@ class TestCreateMXRecord(FakedServiceTestCase):
         self.assertEqual(record.priority, 10)
 
 
+class TestCreateSRVRecord(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.zone = self.user.get_zone_by_name('example.com')
+        self.test_record = self.zone.create_record(
+            'bar.example.com', 'SRV', '',
+            priority=10, weight=5, service='_sip', protocol='_tcp',
+            port=8806, target='example.net'
+        )
+
+    def test_sets_priority(self):
+        self.assertEqual(self.test_record.priority, 10)
+
+    def test_sets_weight(self):
+        self.assertEqual(self.test_record.weight, 5)
+
+    def test_sets_service(self):
+        self.assertEqual(self.test_record.service, u'_sip')
+
+    def test_sets_protocol(self):
+        self.assertEqual(self.test_record.proto, u'_tcp')
+
+    def test_sets_port(self):
+        self.assertEqual(self.test_record.port, 8806)
+
+    def test_sets_target(self):
+        self.assertEqual(self.test_record.target, 'example.net')
+
+
 class TestDeleteRecord(FakedServiceTestCase):
     def setUp(self):
         self.user = User.get(email='foo@example.net')
