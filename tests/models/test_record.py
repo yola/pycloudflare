@@ -124,16 +124,16 @@ class TestUpdateRecord(FakedServiceTestCase):
         self.assertEqual(self.record.proxied, True)
 
     def test_save_without_changes_is_noop(self):
-        with patch.object(self.record.service, 'update_dns_record'):
+        with patch.object(self.record._service, 'update_dns_record'):
             self.record.save()
             self.assertEqual(
-                self.record.service.update_dns_record.call_count, 0)
+                self.record._service.update_dns_record.call_count, 0)
 
     def test_save_performs_update(self):
         self.record.proxied = True
-        with patch.object(self.record.service, 'update_dns_record'):
+        with patch.object(self.record._service, 'update_dns_record'):
             self.record.save()
-            self.record.service.update_dns_record.assert_called_with(
+            self.record._service.update_dns_record.assert_called_with(
                 self.zone.id, self.record.id, {'proxied': True})
 
     def test_invalidates_zone_records_on_rename(self):

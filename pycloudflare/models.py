@@ -9,7 +9,7 @@ from pycloudflare.services import (
 class User(object):
     def __init__(self, email, api_key):
         self.email = email
-        self.service = self.get_service(api_key, email)
+        self._service = self.get_service(api_key, email)
 
     @classmethod
     def get_host_service(cls):
@@ -51,11 +51,11 @@ class User(object):
         return list(self.iter_zones())
 
     def iter_zones(self):
-        for zone in CloudFlarePageIterator(self.service.get_zones):
+        for zone in CloudFlarePageIterator(self._service.get_zones):
             yield Zone(self, zone)
 
     def get_zone_by_name(self, name):
-        zone = self.service.get_zone_by_name(name)
+        zone = self._service.get_zone_by_name(name)
         return Zone(self, zone)
 
     def create_host_zone(self, name, jump_start=False):
@@ -71,8 +71,8 @@ class User(object):
         return zone
 
     def create_zone(self, name, jump_start=False, organization=None):
-        zone = self.service.create_zone(name=name, jump_start=jump_start,
-                                        organization=organization)
+        zone = self._service.create_zone(name=name, jump_start=jump_start,
+                                         organization=organization)
         return Zone(self, zone)
 
     def __repr__(self):
@@ -82,7 +82,7 @@ class User(object):
 class Zone(object):
     def __init__(self, user, data):
         self.user = user
-        self.service = user.service
+        self._service = user._service
         self._data = data
 
     def __getattr__(self, name):
@@ -91,7 +91,7 @@ class Zone(object):
         raise AttributeError()
 
     def delete(self):
-        self.service.delete_zone(self.id)
+        self._service.delete_zone(self.id)
         clear_property_cache(self.user, 'zones')
 
     @cached_property
@@ -100,7 +100,7 @@ class Zone(object):
 
     def iter_records(self):
         for record in CloudFlarePageIterator(
-                self.service.get_dns_records, args=(self.id,)):
+                self._service.get_dns_records, args=(self.id,)):
             yield Record(self, record)
 
     @cached_property
@@ -136,7 +136,7 @@ class Zone(object):
                 target=target,
             )
 
-        record = self.service.create_dns_record(self.id, data)
+        record = self._service.create_dns_record(self.id, data)
         clear_property_cache(self, 'records')
         return Record(self, record)
 
@@ -147,14 +147,14 @@ class Zone(object):
 class ZoneSettings(object):
     def __init__(self, zone):
         self.zone = zone
-        self.service = zone.service
+        self._service = zone._service
         self._get_settings()
         self._updates = {}
 
     def _get_settings(self):
         self._settings = {}
         for setting in CloudFlarePageIterator(
-                self.service.get_zone_settings, args=(self.zone.id,)):
+                self._service.get_zone_settings, args=(self.zone.id,)):
             self._settings[setting['id']] = setting
 
     def __getattr__(self, name):
@@ -165,7 +165,7 @@ class ZoneSettings(object):
         raise AttributeError()
 
     def __setattr__(self, name, value):
-        if name in ('zone', 'service', '_settings', '_updates'):
+        if name in ('zone', '_service', '_settings', '_updates'):
             return super(ZoneSettings, self).__setattr__(name, value)
         if name not in self._settings:
             raise AttributeError('Not a valid setting')
@@ -178,7 +178,7 @@ class ZoneSettings(object):
             return
         items = [{'id': name, 'value': value}
                  for name, value in iteritems(self._updates)]
-        self.service.set_zone_settings(self.zone.id, items)
+        self._service.set_zone_settings(self.zone.id, items)
         self._get_settings()
         self._updates = {}
 
@@ -194,7 +194,7 @@ class Record(object):
 
     def __init__(self, zone, data):
         self.zone = zone
-        self.service = zone.service
+        self._service = zone._service
         self._data = data
         self._updates = {}
 
@@ -206,7 +206,7 @@ class Record(object):
         raise AttributeError()
 
     def __setattr__(self, name, value):
-        if name in ('zone', 'service', '_data', '_updates'):
+        if name in ('zone', '_service', '_data', '_updates'):
             return super(Record, self).__setattr__(name, value)
         if name in self._data:
             self._updates[name] = value
@@ -215,15 +215,15 @@ class Record(object):
 
     def save(self):
         if self._updates:
-            result = self.service.update_dns_record(self.zone.id, self.id,
-                                                    self._updates)
+            result = self._service.update_dns_record(self.zone.id, self.id,
+                                                     self._updates)
             self._data.update(result)
             if 'name' in self._updates:
                 clear_property_cache(self.zone, 'records')
             self._updates = {}
 
     def delete(self):
-        self.service.delete_dns_record(self.zone.id, self.id)
+        self._service.delete_dns_record(self.zone.id, self.id)
         clear_property_cache(self.zone, 'records')
 
     def __repr__(self):

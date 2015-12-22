@@ -7,7 +7,7 @@ class UserAttributeTestsMixin(object):
         self.assertEqual(self.user.email, 'foo@example.net')
 
     def test_sets_service_attribute(self):
-        self.assertTrue(self.user.service)
+        self.assertTrue(self.user._service)
 
     def test_repr_able(self):
         self.assertEqual(repr(self.user), 'User<foo@example.net>')
