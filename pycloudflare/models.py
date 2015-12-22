@@ -112,19 +112,19 @@ class Zone(object):
             value.sort(key=lambda r: (r.type, r.content))
         return by_name
 
-    def create_record(self, name, type, content, ttl=1, proxied=False,
+    def create_record(self, name, record_type, content, ttl=1, proxied=False,
                       priority=10, service=None, protocol=None, weight=0,
                       port=None, target=None):
         data = {
             'name': name,
-            'type': type,
+            'type': record_type,
             'content': content,
             'ttl': ttl,
             'proxied': proxied,
         }
-        if type == 'MX':
+        if record_type == 'MX':
             data['priority'] = priority
-        elif type == 'SRV':
+        elif record_type == 'SRV':
             data.update(
                 service=service,
                 name=name,
