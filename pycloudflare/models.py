@@ -113,7 +113,7 @@ class Zone(object):
         return by_name
 
     def create_record(self, name, record_type, content=None, ttl=1,
-                      proxied=False, priority=10, **kwargs):
+                      proxied=False, **kwargs):
         data = {
             'name': name,
             'type': record_type,
@@ -124,14 +124,14 @@ class Zone(object):
         if content:
             data['content'] = content
 
-        if record_type == 'MX':
-            data['priority'] = priority
+        if record_type == 'MX' and kwargs:
+            data['priority'] = kwargs['priority']
         elif record_type == 'SRV' and kwargs:
             data.update(
                 service=kwargs['service'],
                 name=name,
                 proto=kwargs['protocol'],
-                priority=priority,
+                priority=kwargs['priority'],
                 weight=kwargs['weight'],
                 port=kwargs['port'],
                 target=kwargs['target'],

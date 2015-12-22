@@ -6,6 +6,7 @@
 * Rename `service` attributes of models to `_service`.
 * Use `record_type` instead of `type` in `create_record` signature.
 * Make `content` parameter to `create_record` optional.
+* Use `kwargs` for `priority` parameter in `create_record`.
 
 ## 0.1.2
 
