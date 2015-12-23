@@ -49,5 +49,5 @@ The integration tests require a host API key. They can be run with::
 
     nosetests tests/test_integration.py
 
-.. |Build Status| image:: https://travis-ci.org/yola/pycloudflare.svg
+.. |Build Status| image:: https://travis-ci.org/yola/pycloudflare.svg?branch=master
    :target: https://travis-ci.org/yola/pycloudflare
