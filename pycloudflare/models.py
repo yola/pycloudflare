@@ -124,9 +124,9 @@ class Zone(object):
         if content:
             data['content'] = content
 
-        if record_type == 'MX' and kwargs:
+        if record_type == 'MX':
             data['priority'] = kwargs['priority']
-        elif record_type == 'SRV' and kwargs:
+        elif record_type == 'SRV':
             data.update(
                 service=kwargs['service'],
                 name=name,
