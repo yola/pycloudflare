@@ -129,7 +129,6 @@ class Zone(object):
         elif record_type == 'SRV':
             data.update(
                 service=kwargs['service'],
-                name=name,
                 proto=kwargs['protocol'],
                 priority=kwargs['priority'],
                 weight=kwargs['weight'],
