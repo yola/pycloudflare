@@ -127,14 +127,15 @@ class Zone(object):
         if record_type == 'MX':
             data['priority'] = kwargs['priority']
         elif record_type == 'SRV':
-            data.update(
-                service=kwargs['service'],
-                proto=kwargs['protocol'],
-                priority=kwargs['priority'],
-                weight=kwargs['weight'],
-                port=kwargs['port'],
-                target=kwargs['target'],
-            )
+            data['data'] = {
+                'name': name,
+                'service': kwargs['service'],
+                'proto': kwargs['protocol'],
+                'priority': kwargs['priority'],
+                'weight': kwargs['weight'],
+                'port': kwargs['port'],
+                'target': kwargs['target'],
+            }
 
         record = self._service.create_dns_record(self.id, data)
         clear_property_cache(self, 'records')
