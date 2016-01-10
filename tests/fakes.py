@@ -161,8 +161,7 @@ class FakeService(object):
             'created_on': '2014-01-01T05:20:00.12345Z',
             'modified_on': '2014-01-01T05:20:00.12345Z',
         })
-        if 'data' not in data:
-            data['data'] = {}
+        data.setdefault('data', {})
         self.zones[zone_id]['_records'].append(data)
         return deepcopy(data)
 
