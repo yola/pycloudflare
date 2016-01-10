@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+* Move attributes required for SRV records into the correct field.
+
 ## 0.2.0
 
 * Add SRV record support to allow for the creation of SRV DNS records.
