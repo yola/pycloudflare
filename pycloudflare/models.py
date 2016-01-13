@@ -192,8 +192,8 @@ class ZoneSettings(object):
 
 class Record(object):
     _data = ()
-    _record_attrs = ('zone', '_service', '_data',
-                     '_was_updated', '_clear_cache')
+    _own_attrs = ('zone', '_service', '_data',
+                  '_was_updated', '_clear_cache')
 
     def __init__(self, zone, data):
         self.zone = zone
@@ -211,7 +211,8 @@ class Record(object):
         if name in self._record_attrs:
             return super(Record, self).__setattr__(name, value)
         if name in self._data:
-            self._clear_cache = (name == 'name')
+            if name == 'name':
+                self._clear_cache = True
             self._data[name] = value
             self._was_updated = True
         else:
