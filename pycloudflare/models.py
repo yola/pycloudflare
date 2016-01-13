@@ -208,7 +208,7 @@ class Record(object):
         raise AttributeError()
 
     def __setattr__(self, name, value):
-        if name in self._record_attrs:
+        if name in self._own_attrs:
             return super(Record, self).__setattr__(name, value)
         if name in self._data:
             if name == 'name':
