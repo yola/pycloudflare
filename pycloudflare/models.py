@@ -192,36 +192,40 @@ class ZoneSettings(object):
 
 class Record(object):
     _data = ()
+    _record_attrs = ('zone', '_service', '_data',
+                     '_was_updated', '_clear_cache')
 
     def __init__(self, zone, data):
         self.zone = zone
         self._service = zone._service
         self._data = data
-        self._updates = {}
+        self._was_updated = False
+        self._clear_cache = False
 
     def __getattr__(self, name):
-        if name in self._updates:
-            return self._updates[name]
         if name in self._data:
             return self._data[name]
         raise AttributeError()
 
     def __setattr__(self, name, value):
-        if name in ('zone', '_service', '_data', '_updates'):
+        if name in self._record_attrs:
             return super(Record, self).__setattr__(name, value)
         if name in self._data:
-            self._updates[name] = value
+            self._clear_cache = (name == 'name')
+            self._data[name] = value
+            self._was_updated = True
         else:
             raise AttributeError()
 
     def save(self):
-        if self._updates:
+        if self._was_updated:
             result = self._service.update_dns_record(self.zone.id, self.id,
-                                                     self._updates)
+                                                     self._data)
             self._data.update(result)
-            if 'name' in self._updates:
+            if self._clear_cache:
                 clear_property_cache(self.zone, 'records')
-            self._updates = {}
+                self._clear_cache = False
+            self._was_updated = False
 
     def delete(self):
         self._service.delete_dns_record(self.zone.id, self.id)

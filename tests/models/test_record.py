@@ -133,7 +133,7 @@ class TestUpdateRecord(FakedServiceTestCase):
         with patch.object(self.record._service, 'update_dns_record'):
             self.record.save()
             self.record._service.update_dns_record.assert_called_with(
-                self.zone.id, self.record.id, {'proxied': True})
+                self.zone.id, self.record.id, self.record._data)
 
     def test_invalidates_zone_records_on_rename(self):
         self.assertNotIn('quux.example.com', self.zone.records)
