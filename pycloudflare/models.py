@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from property_caching import (
     cached_property, clear_property_cache, set_property_cache)
 from six import iteritems, itervalues
@@ -192,41 +194,36 @@ class ZoneSettings(object):
 
 class Record(object):
     _data = ()
-    _own_attrs = ('zone', '_service', '_data',
-                  '_was_updated', '_clear_cache')
+    _own_attrs = ('zone', '_service', '_data', '_old_data')
 
     def __init__(self, zone, data):
         self.zone = zone
         self._service = zone._service
         self._data = data
-        self._was_updated = False
-        self._clear_cache = False
+        self._old_data = deepcopy(data)
 
     def __getattr__(self, name):
         if name in self._data:
             return self._data[name]
+        if name in self._old_data:
+            return self._old_data[name]
         raise AttributeError()
 
     def __setattr__(self, name, value):
         if name in self._own_attrs:
             return super(Record, self).__setattr__(name, value)
         if name in self._data:
-            if name == 'name':
-                self._clear_cache = True
             self._data[name] = value
-            self._was_updated = True
         else:
             raise AttributeError()
 
     def save(self):
-        if self._was_updated:
+        if self._old_data != self._data:
             result = self._service.update_dns_record(self.zone.id, self.id,
                                                      self._data)
-            self._data.update(result)
-            if self._clear_cache:
+            if self._data['name'] != self._old_data['name']:
                 clear_property_cache(self.zone, 'records')
-                self._clear_cache = False
-            self._was_updated = False
+            self._old_data = result
 
     def delete(self):
         self._service.delete_dns_record(self.zone.id, self.id)
