@@ -199,8 +199,7 @@ class Record(object):
     def __init__(self, zone, data):
         self.zone = zone
         self._service = zone._service
-        self._data = data
-        self._saved_data = deepcopy(data)
+        self._set_data(data)
 
     def __getattr__(self, name):
         if name in self._data:
@@ -215,13 +214,17 @@ class Record(object):
         else:
             raise AttributeError()
 
+    def _set_data(self, data):
+        self._saved_data = data
+        self._data = deepcopy(data)
+
     def save(self):
         if self._saved_data != self._data:
             result = self._service.update_dns_record(self.zone.id, self.id,
                                                      self._data)
             if self._data['name'] != self._saved_data['name']:
                 clear_property_cache(self.zone, 'records')
-            self._saved_data = result
+            self._set_data(result)
 
     def delete(self):
         self._service.delete_dns_record(self.zone.id, self.id)
