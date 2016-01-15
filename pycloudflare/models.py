@@ -205,8 +205,6 @@ class Record(object):
     def __getattr__(self, name):
         if name in self._data:
             return self._data[name]
-        if name in self._old_data:
-            return self._old_data[name]
         raise AttributeError()
 
     def __setattr__(self, name, value):
