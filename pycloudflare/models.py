@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from property_caching import (
     cached_property, clear_property_cache, set_property_cache)
 from six import iteritems, itervalues
@@ -127,14 +129,15 @@ class Zone(object):
         if record_type == 'MX':
             data['priority'] = kwargs['priority']
         elif record_type == 'SRV':
-            data.update(
-                service=kwargs['service'],
-                proto=kwargs['protocol'],
-                priority=kwargs['priority'],
-                weight=kwargs['weight'],
-                port=kwargs['port'],
-                target=kwargs['target'],
-            )
+            data['data'] = {
+                'name': name,
+                'service': kwargs['service'],
+                'proto': kwargs['protocol'],
+                'priority': kwargs['priority'],
+                'weight': kwargs['weight'],
+                'port': kwargs['port'],
+                'target': kwargs['target'],
+            }
 
         record = self._service.create_dns_record(self.id, data)
         clear_property_cache(self, 'records')
@@ -191,36 +194,34 @@ class ZoneSettings(object):
 
 class Record(object):
     _data = ()
+    _own_attrs = ('zone', '_service', '_data', '_saved_data')
 
     def __init__(self, zone, data):
         self.zone = zone
         self._service = zone._service
         self._data = data
-        self._updates = {}
+        self._saved_data = deepcopy(data)
 
     def __getattr__(self, name):
-        if name in self._updates:
-            return self._updates[name]
         if name in self._data:
             return self._data[name]
         raise AttributeError()
 
     def __setattr__(self, name, value):
-        if name in ('zone', '_service', '_data', '_updates'):
+        if name in self._own_attrs:
             return super(Record, self).__setattr__(name, value)
         if name in self._data:
-            self._updates[name] = value
+            self._data[name] = value
         else:
             raise AttributeError()
 
     def save(self):
-        if self._updates:
+        if self._saved_data != self._data:
             result = self._service.update_dns_record(self.zone.id, self.id,
-                                                     self._updates)
-            self._data.update(result)
-            if 'name' in self._updates:
+                                                     self._data)
+            if self._data['name'] != self._saved_data['name']:
                 clear_property_cache(self.zone, 'records')
-            self._updates = {}
+            self._saved_data = result
 
     def delete(self):
         self._service.delete_dns_record(self.zone.id, self.id)

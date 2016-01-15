@@ -79,22 +79,22 @@ class TestCreateSRVRecord(FakedServiceTestCase):
         )
 
     def test_sets_priority(self):
-        self.assertEqual(self.test_record.priority, 10)
+        self.assertEqual(self.test_record.data['priority'], 10)
 
     def test_sets_weight(self):
-        self.assertEqual(self.test_record.weight, 5)
+        self.assertEqual(self.test_record.data['weight'], 5)
 
     def test_sets_service(self):
-        self.assertEqual(self.test_record.service, '_sip')
+        self.assertEqual(self.test_record.data['service'], '_sip')
 
     def test_sets_protocol(self):
-        self.assertEqual(self.test_record.proto, '_tcp')
+        self.assertEqual(self.test_record.data['proto'], '_tcp')
 
     def test_sets_port(self):
-        self.assertEqual(self.test_record.port, 8806)
+        self.assertEqual(self.test_record.data['port'], 8806)
 
     def test_sets_target(self):
-        self.assertEqual(self.test_record.target, 'example.net')
+        self.assertEqual(self.test_record.data['target'], 'example.net')
 
 
 class TestDeleteRecord(FakedServiceTestCase):
@@ -133,7 +133,7 @@ class TestUpdateRecord(FakedServiceTestCase):
         with patch.object(self.record._service, 'update_dns_record'):
             self.record.save()
             self.record._service.update_dns_record.assert_called_with(
-                self.zone.id, self.record.id, {'proxied': True})
+                self.zone.id, self.record.id, self.record._data)
 
     def test_invalidates_zone_records_on_rename(self):
         self.assertNotIn('quux.example.com', self.zone.records)
