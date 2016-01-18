@@ -2,11 +2,14 @@
 from setuptools import setup
 import pycloudflare
 
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
 
 setup(
     name=pycloudflare.__name__,
     version=pycloudflare.__version__,
     description=pycloudflare.__doc__,
+    long_description=readme,
     author='Yola',
     author_email='engineers@yola.com',
     license='MIT (Expat)',
