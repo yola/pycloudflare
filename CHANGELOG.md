@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.2
+
+* Assign `_data` to the returned result as the `Record` meta values change on
+`save`.
+
 ## 0.2.1
 
 * Move attributes required for SRV records into the correct field.
