@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.3
+
+* Include `README.rst` file in package, since `setup.py` depends on it
+
 ## 0.2.2
 
 * Assign `_data` to the returned result as the `Record` meta values change on
