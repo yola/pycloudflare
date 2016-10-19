@@ -179,7 +179,7 @@ class HostUserTest(TestCase):
 class CreateHostZoneTest(TestCase):
     def setUp(self):
         user = User(TEST_USER['email'], TEST_USER['api_key'])
-        self.zone = user.create_host_zone('example2.com')
+        self.zone = user.create_host_zone('example{}.com'.format(uuid4().hex))
 
     def test_creates_zone_without_any_records(self):
         self.assertEqual(self.zone.records, {})
