@@ -1,6 +1,6 @@
 # Changelog
 
-## DEV
+## 0.3.0
 
 * Switched to Demands >= 4.0.0
 
