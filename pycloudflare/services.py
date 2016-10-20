@@ -17,7 +17,6 @@ class CloudFlarePageIterator(PaginatedAPIIterator):
 class CloudFlareService(HTTPServiceClient):
     def __init__(self, api_key, email):
         headers = {
-            'Content-Type': 'application/json',
             'X-Auth-Key': api_key,
             'X-Auth-Email': email,
         }
@@ -57,14 +56,14 @@ class CloudFlareService(HTTPServiceClient):
 
     def set_zone_settings(self, zone_id, items):
         data = {'items': items}
-        return self.patch('zones/%s/settings' % zone_id, data)
+        return self.patch('zones/%s/settings' % zone_id, json=data)
 
     def get_zone_setting(self, zone_id, setting):
         return self.get('zones/%s/settings/%s' % (zone_id, setting))
 
     def set_zone_setting(self, zone_id, setting, value):
         url = 'zones/%s/settings/%s' % (zone_id, setting)
-        return self.patch(url, {'value': value})
+        return self.patch(url, json={'value': value})
 
     def create_zone(self, name, jump_start=False, organization=None):
         data = {
@@ -73,7 +72,7 @@ class CloudFlareService(HTTPServiceClient):
         }
         if organization:
             data['organization'] = {'id': organization}
-        return self.post('zones', data)
+        return self.post('zones', json=data)
 
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)
@@ -87,11 +86,11 @@ class CloudFlareService(HTTPServiceClient):
         return self.get('zones/%s/dns_records/%s' % (zone_id, record_id))
 
     def create_dns_record(self, zone_id, content):
-        return self.post('zones/%s/dns_records' % zone_id, content)
+        return self.post('zones/%s/dns_records' % zone_id, json=content)
 
     def update_dns_record(self, zone_id, record_id, content):
         url = 'zones/%s/dns_records/%s' % (zone_id, record_id)
-        return self.patch(url, content)
+        return self.patch(url, json=content)
 
     def delete_dns_record(self, zone_id, record_id):
         return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))
