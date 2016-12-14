@@ -1,8 +1,16 @@
 # Changelog
 
+## DEV
+
+* Add `services.CloudFlareHostService.zone_set` method.
+
 ## 0.3.0
 
-* Switched to Demands >= 4.0.0
+* Switch to Demands >= 4.0.0
+
+## 0.3.0
+
+* Switch to Demands >= 4.0.0
 
 ## 0.2.3
 

@@ -149,6 +149,25 @@ class HostZonesTest(TestCase):
         response = self.cfh.full_zone_set('example.org', self.user['user_key'])
         self.assertIsInstance(response, dict)
 
+    def test_zone_set(self):
+        expected_response = {
+            'hosted_cnames': {
+                'www.example.org': u'resolve-to.example.org'
+            },
+            'zone_name': 'example.org',
+            'forward_tos': {
+                'www.example.org': 'www.example.org.cdn.cloudflare.net'
+            },
+            'resolving_to': 'resolve-to.example.org'
+        }
+
+        response = self.cfh.zone_set(
+            'example.org', self.user['user_key'], ['www.example.org'],
+            'resolve-to.example.org'
+        )
+        self.assertEqual(response, expected_response)
+
+
 
 class HostUserTest(TestCase):
     @classmethod
