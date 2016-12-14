@@ -152,7 +152,7 @@ class HostZonesTest(TestCase):
     def test_zone_set(self):
         expected_response = {
             'hosted_cnames': {
-                'www.example.org': u'resolve-to.example.org'
+                'www.example.org': 'resolve-to.example.org'
             },
             'zone_name': 'example.org',
             'forward_tos': {
