@@ -8,10 +8,6 @@
 
 * Switch to Demands >= 4.0.0
 
-## 0.3.0
-
-* Switch to Demands >= 4.0.0
-
 ## 0.2.3
 
 * Include `README.rst` file in package, since `setup.py` depends on it
