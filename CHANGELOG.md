@@ -1,6 +1,6 @@
 # Changelog
 
-## DEV
+## 0.3.1
 
 * Add `services.CloudFlareHostService.zone_set` method.
 
