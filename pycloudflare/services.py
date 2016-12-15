@@ -154,6 +154,16 @@ class CloudFlareHostService(HTTPServiceClient):
         }
         return self.post(self.gw, data)
 
+    def zone_set(self, zone_name, user_key, subdomains, resolve_to):
+        data = {
+            'act': 'zone_set',
+            'user_key': user_key,
+            'zone_name': zone_name,
+            'subdomains': ','.join(subdomains),
+            'resolve_to': resolve_to,
+        }
+        return self.post(self.gw, data)
+
     def zone_list(self, zone_name=None, zone_status=None, sub_id=None,
                   sub_status=None, offset=0,
                   limit=CloudFlareHostPageIterator.page_size):
