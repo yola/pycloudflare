@@ -78,7 +78,6 @@ class TestZoneRecords(FakedServiceTestCase):
 class TestSetCNameZone(FakedServiceTestCase):
     def setUp(self):
         self.user = User.get(email='foo@example.net')
-        #self.user._service._add_zone('example.org', 'example.org')
         self.result = self.user.create_cname_zone(
             'example.org', ['cname.example.org'], 'resolve-to.example.org')
 
