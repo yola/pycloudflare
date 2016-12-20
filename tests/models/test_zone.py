@@ -79,8 +79,18 @@ class TestSetCNameZone(FakedServiceTestCase):
     def setUp(self):
         self.user = User.get(email='foo@example.net')
         self.user._service._add_zone('example.net', 'example.net')
-        self.zone = self.user.set_cname_zone(
+        self.result = self.user.set_cname_zone(
             'example.net', ['cname.example.net'], 'resolve-to.example.org')
 
     def test_returns_zone_object(self):
-        self.assertIsInstance(self.zone, Zone)
+        expected_response = {
+            'hosted_cnames': {
+                'www.example.org': 'resolve-to.example.org'
+            },
+            'zone_name': 'example.org',
+            'forward_tos': {
+                'www.example.org': 'www.example.org.cdn.cloudflare.net'
+            },
+            'resolving_to': 'resolve-to.example.org'
+        }
+        self.assertEqual(self.result, expected_response)
