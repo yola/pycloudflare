@@ -1,5 +1,9 @@
 # Changelog
 
+## DEV
+
+* Add `models.User.create_cname_zone` method.
+
 ## 0.3.1
 
 * Add `services.CloudFlareHostService.zone_set` method.
