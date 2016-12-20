@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.3.2
+## DEV
 
-* Add `models.User.set_cname_zone` method.
+* Add `models.User.create_cname_zone` method.
 
 ## 0.3.1
 

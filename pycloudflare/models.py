@@ -72,7 +72,7 @@ class User(object):
 
         return zone
 
-    def set_cname_zone(self, zone_name, subdomains, resolve_to):
+    def create_cname_zone(self, zone_name, subdomains, resolve_to):
         host_service = self.get_host_service()
         result = host_service.zone_set(
             zone_name, self.user_key, subdomains, resolve_to)
