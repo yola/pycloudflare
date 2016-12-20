@@ -73,3 +73,14 @@ class TestZoneRecords(FakedServiceTestCase):
         self.assertIsInstance(self.zone.records, dict)
         self.assertIsInstance(self.zone.records['example.com'], list)
         self.assertIsInstance(self.zone.records['example.com'][0], Record)
+
+
+class TestSetCNameZone(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.user._service._add_zone('example.net', 'example.net')
+        self.zone = self.user.set_cname_zone(
+            'example.net', ['cname.example.net'], 'resolve-to.example.org')
+
+    def test_returns_zone_object(self):
+        self.assertIsInstance(self.zone, Zone)

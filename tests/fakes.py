@@ -34,6 +34,19 @@ class FakeHostService(object):
                 return user.copy()
         raise Exception('Not Found')
 
+    def zone_set(self, zone_name, user_key, subdomains, resolve_to):
+        expected_response = {
+            'hosted_cnames': {
+                'www.example.org': 'resolve-to.example.org'
+            },
+            'zone_name': 'example.org',
+            'forward_tos': {
+                'www.example.org': 'www.example.org.cdn.cloudflare.net'
+            },
+            'resolving_to': 'resolve-to.example.org'
+        }
+        return expected_response
+
 
 class FakeService(object):
     def __init__(self, api_key, email):
