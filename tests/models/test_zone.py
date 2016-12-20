@@ -81,7 +81,7 @@ class TestSetCNameZone(FakedServiceTestCase):
         self.result = self.user.create_cname_zone(
             'example.org', ['cname.example.org'], 'resolve-to.example.org')
 
-    def test_returns_zone_object(self):
+    def test_returns_correct_data_from_service(self):
         expected_response = {
             'hosted_cnames': {
                 'www.example.org': 'resolve-to.example.org'
