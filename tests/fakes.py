@@ -196,3 +196,6 @@ class FakeService(object):
             raise Exception('Not Found')
         record.update(data)
         return deepcopy(record)
+
+    def purge_cache(self, zone_id, files=None, tags=None):
+        return

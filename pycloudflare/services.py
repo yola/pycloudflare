@@ -95,6 +95,16 @@ class CloudFlareService(HTTPServiceClient):
     def delete_dns_record(self, zone_id, record_id):
         return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))
 
+    def purge_cache(self, zone_id, files=None, tags=None):
+        data = {}
+        if files:
+            data['files'] = files
+        if tags:
+            data['tags'] = tags
+        if files is None and tags is None:
+            data['purge_everything'] = True
+        return self.delete('zones/%s/purge_cache' % zone_id, json=data)
+
 
 class CloudFlareHostPageIterator(PaginatedAPIIterator):
     page_param = 'offset'
