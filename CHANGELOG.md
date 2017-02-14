@@ -1,5 +1,9 @@
 # Changelog
 
+## DEV
+
+* Add `models.Zone.purge_cache` method (and corresponding service support).
+
 ## 0.3.2
 
 * Add `models.User.create_cname_zone` method.
