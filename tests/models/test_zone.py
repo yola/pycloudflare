@@ -93,3 +93,12 @@ class TestSetCNameZone(FakedServiceTestCase):
             'resolving_to': 'resolve-to.example.org'
         }
         self.assertEqual(self.result, expected_response)
+
+
+class TestPurgeZone(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.zone = self.user.get_zone_by_name('example.com')
+
+    def test_full_purge(self):
+        self.zone.purge_cache()

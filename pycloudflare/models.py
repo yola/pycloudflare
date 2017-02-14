@@ -149,6 +149,9 @@ class Zone(object):
         clear_property_cache(self, 'records')
         return Record(self, record)
 
+    def purge_cache(self, files=None, tags=None):
+        self._service.purge_cache(self.id, files=files, tags=tags)
+
     def __repr__(self):
         return 'Zone<%s>' % self.name
 
