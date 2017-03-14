@@ -2,8 +2,8 @@
 
 ## DEV
 
-* Add `models.Zone.get_ssl_verification_info` and corresponding service
-  support.
+* Add `models.Zone.get_ssl_verification_info` method.
+* Add `services.CloudFlareService.get_ssl_verification_info` method.
 
 ## 0.3.3
 
