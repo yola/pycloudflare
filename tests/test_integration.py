@@ -16,7 +16,7 @@ def setUpModule():
     cfh = CloudFlareHostService()
     TEST_USER['password'] = uuid4().hex
     TEST_USER['unique_id'] = uuid4().hex
-    TEST_USER['email'] = '%s@integrationtest.example.net' % uuid4().hex
+    TEST_USER['email'] = '%s@example.net' % uuid4().hex
     r = cfh.user_create(email=TEST_USER['email'],
                         password=TEST_USER['password'],
                         unique_id=TEST_USER['unique_id'])
@@ -59,6 +59,9 @@ class ZoneTest(TestCase):
                     break
         cls.record_id = record['id']
 
+        cls.cfh = CloudFlareHostService()
+        cls.user = cls.cfh.user_lookup(email=TEST_USER['email'])
+
     @classmethod
     def tearDownClass(cls):
         cls.cf.delete_zone(cls.zone_id)
@@ -100,6 +103,21 @@ class ZoneTest(TestCase):
         self.assertIn('value', setting)
         self.assertIn(setting['value'], ('on', 'off'))
 
+    def test_get_ssl_verification_info(self):
+        self.cfh.zone_set(
+            'example1.org', self.user['user_key'], ['www.example1.org'],
+            'resolve-to.example1.org'
+        )
+
+        zone_id = self.cf.get_zone_by_name('example1.org')['id']
+        self.cf.set_zone_setting(zone_id, 'ssl', 'full')
+        ssl_info = self.cf.get_ssl_verification_info(zone_id)
+        self.assertIsInstance(ssl_info, list)
+        for key in [
+                'brand_check', 'certificate_status', 'verification_info',
+                'verification_type', 'signature']:
+            self.assertIn(key, ssl_info[0])
+
     def test_set_zone_setting(self):
         setting = self.cf.set_zone_setting(self.zone_id, 'always_online', 'on')
         self.assertIn('value', setting)
@@ -136,6 +154,9 @@ class HostZonesTest(TestCase):
         self.cfh = CloudFlareHostService()
         self.user = self.cfh.user_lookup(email=TEST_USER['email'])
 
+    def tearDown(self):
+        tearDownModule()
+
     def test_zone_list(self):
         zones = CloudFlareHostPageIterator(self.cfh.zone_list)
         try:
@@ -146,27 +167,27 @@ class HostZonesTest(TestCase):
             self.assertIsInstance(zone, dict)
 
     def test_full_zone_set(self):
-        response = self.cfh.full_zone_set('example.org', self.user['user_key'])
+        response = self.cfh.full_zone_set(
+            'example1.org', self.user['user_key'])
         self.assertIsInstance(response, dict)
 
     def test_zone_set(self):
         expected_response = {
             'hosted_cnames': {
-                'www.example.org': 'resolve-to.example.org'
+                'www.example1.org': 'resolve-to.example1.org'
             },
-            'zone_name': 'example.org',
+            'zone_name': 'example1.org',
             'forward_tos': {
-                'www.example.org': 'www.example.org.cdn.cloudflare.net'
+                'www.example1.org': 'www.example1.org.cdn.cloudflare.net'
             },
-            'resolving_to': 'resolve-to.example.org'
+            'resolving_to': 'resolve-to.example1.org'
         }
 
         response = self.cfh.zone_set(
-            'example.org', self.user['user_key'], ['www.example.org'],
-            'resolve-to.example.org'
+            'example1.org', self.user['user_key'], ['www.example1.org'],
+            'resolve-to.example1.org'
         )
         self.assertEqual(response, expected_response)
-
 
 
 class HostUserTest(TestCase):

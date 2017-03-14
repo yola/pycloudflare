@@ -1,5 +1,9 @@
 # Changelog
 
+## DEV
+
+* Add `services.get_ssl_verification_info` method.
+
 ## 0.3.3
 
 * Add `models.Zone.purge_cache` method (and corresponding service support).
