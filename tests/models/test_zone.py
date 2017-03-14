@@ -57,6 +57,8 @@ class TestDeleteZone(FakedServiceTestCase):
         self.assertNotEqual(self.user.zones, [])
         zone = self.user.get_zone_by_name('example.com')
         zone.delete()
+        zone = self.user.get_zone_by_name('example.org')
+        zone.delete()
         self.assertEqual(self.user.zones, [])
 
 
@@ -93,6 +95,20 @@ class TestSetCNameZone(FakedServiceTestCase):
             'resolving_to': 'resolve-to.example.org'
         }
         self.assertEqual(self.result, expected_response)
+
+
+class TestGetSSLVerificationInfoForZone(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        zone = self.user.create_cname_zone(
+            'example.org', ['cname.example.org'], 'resolve-to.example.org')
+        zone = self.user.get_zone_by_name('example.org')
+        zone.settings.ssl = 'full'
+        zone.settings.save()
+        self.result = zone.get_ssl_verification_info()
+
+    def test_ssl_verification_info_is_returned(self):
+        self.assertEqual(self.result, 'ssl_verification_info')
 
 
 class TestPurgeZone(FakedServiceTestCase):

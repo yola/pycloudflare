@@ -152,6 +152,9 @@ class Zone(object):
     def purge_cache(self, files=None, tags=None):
         self._service.purge_cache(self.id, files=files, tags=tags)
 
+    def get_ssl_verification_info(self):
+        return self._service.get_ssl_verification_info(self.id)
+
     def __repr__(self):
         return 'Zone<%s>' % self.name
 

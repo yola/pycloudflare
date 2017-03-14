@@ -1,5 +1,10 @@
 # Changelog
 
+## DEV
+
+* Add `models.Zone.get_ssl_verification_info` method.
+* Add `services.CloudFlareService.get_ssl_verification_info` method.
+
 ## 0.3.3
 
 * Add `models.Zone.purge_cache` method (and corresponding service support).
