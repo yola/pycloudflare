@@ -87,6 +87,7 @@ class ZoneTest(TestCase):
             if setting['id'] == 'always_online':
                 self.assertIn(setting['value'], ('on', 'off'))
                 return
+
         raise AssertionError('Expected to find always_online setting')
 
     def test_set_zone_settings(self):
@@ -153,9 +154,6 @@ class HostZonesTest(TestCase):
     def setUp(self):
         self.cfh = CloudFlareHostService()
         self.user = self.cfh.user_lookup(email=TEST_USER['email'])
-
-    def tearDown(self):
-        tearDownModule()
 
     def test_zone_list(self):
         zones = CloudFlareHostPageIterator(self.cfh.zone_list)
