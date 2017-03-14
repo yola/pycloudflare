@@ -38,7 +38,7 @@ class ZoneTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cf = cf_service()
-        cls.zone_name = 'example.net'
+        cls.zone_name = 'ex.com'
         try:
             zone = cls.cf.create_zone(cls.zone_name)
         except HTTPServiceError:
@@ -46,7 +46,7 @@ class ZoneTest(TestCase):
         cls.zone_id = zone['id']
         try:
             record = cls.cf.create_dns_record(cls.zone_id, {
-                'name': 'foo.example.net',
+                'name': 'foo.ex.com',
                 'type': 'A',
                 'content': '127.0.0.1',
                 'proxied': False,
@@ -55,7 +55,7 @@ class ZoneTest(TestCase):
         except HTTPServiceError:
             for record in CloudFlarePageIterator(
                     cls.cf.get_dns_records, args=(cls.zone_id,)):
-                if record['name'] == 'foo.example.net':
+                if record['name'] == 'foo.ex.com':
                     break
         cls.record_id = record['id']
 

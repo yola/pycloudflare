@@ -52,6 +52,7 @@ class FakeService(object):
     def __init__(self, api_key, email):
         self.zones = {}
         self._add_zone('9a7806061c88ada191ed06f989cc3dac', 'example.com', True)
+        self._add_zone('9a7806061c88ada191ed06f989cc3dbc', 'example.org', True)
 
     def _add_zone(self, id_, name, records=False):
         zone = {
@@ -125,6 +126,7 @@ class FakeService(object):
                     'editable': True,
                     'modified_on': '2014-01-01T05:20:00.12345Z',
                 },
+                'ssl': {'id': 'ssl', 'editable': True},
             },
         }
         self.zones[id_] = zone
@@ -147,6 +149,9 @@ class FakeService(object):
             if zone['name'] == name:
                 return self._clean_zone(zone)
         raise Exception('Not Found')
+
+    def get_ssl_verification_info(self, zone_id):
+        return 'ssl_verification_info'
 
     def create_zone(self, name, jump_start=False, organization=None):
         zone = self._add_zone(uuid4().hex, name)

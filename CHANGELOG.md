@@ -2,7 +2,8 @@
 
 ## DEV
 
-* Add `services.get_ssl_verification_info` method.
+* Add `models.Zone.get_ssl_verification_info` and corresponding service
+  support.
 
 ## 0.3.3
 
