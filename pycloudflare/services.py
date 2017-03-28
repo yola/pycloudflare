@@ -1,17 +1,26 @@
 from demands import HTTPServiceClient, HTTPServiceError
+from demands.pagination import (
+    PAGE_PARAM, PAGE_SIZE_PARAM, PAGE_SIZE, PAGINATION_TYPE, RESULTS_KEY,
+    PaginatedResults, PaginationType)
 from six.moves.urllib.parse import urlencode
 
 from pycloudflare.config import get_config
-from pycloudflare.pagination import PaginatedAPIIterator
 
 
 class ZoneNotFound(Exception):
     pass
 
 
-class CloudFlarePageIterator(PaginatedAPIIterator):
-    page_size_param = 'per_page'
-    page_size = 50
+CF_PAGINATION_OPTIONS = {
+    PAGE_SIZE_PARAM: 'per_page',
+    PAGE_SIZE: 50,
+    RESULTS_KEY: None,
+}
+
+
+def cloudflare_paginated_results(fn, args=(), kwargs=None):
+    return PaginatedResults(fn, args=args, kwargs=kwargs,
+                            **CF_PAGINATION_OPTIONS)
 
 
 class CloudFlareService(HTTPServiceClient):
@@ -35,7 +44,7 @@ class CloudFlareService(HTTPServiceClient):
         }
         return self.get(base_url + '?' + urlencode(params))
 
-    def get_zones(self, page=1, per_page=CloudFlarePageIterator.page_size):
+    def get_zones(self, page=1, per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
         return self._get_paginated('zones', page, per_page)
 
     def get_zone(self, zone_id):
@@ -50,7 +59,7 @@ class CloudFlareService(HTTPServiceClient):
         return result[0]
 
     def get_zone_settings(self, zone_id, page=1,
-                          per_page=CloudFlarePageIterator.page_size):
+                          per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
         url = 'zones/%s/settings' % zone_id
         return self._get_paginated(url, page, per_page)
 
@@ -78,7 +87,7 @@ class CloudFlareService(HTTPServiceClient):
         return self.delete('zones/%s' % zone_id)
 
     def get_dns_records(self, zone_id, page=1,
-                        per_page=CloudFlarePageIterator.page_size):
+                        per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
         url = 'zones/%s/dns_records' % zone_id
         return self._get_paginated(url, page, per_page)
 
@@ -109,11 +118,18 @@ class CloudFlareService(HTTPServiceClient):
         return self.get('zones/%s/ssl/verification' % zone_id)
 
 
-class CloudFlareHostPageIterator(PaginatedAPIIterator):
-    page_param = 'offset'
-    page_size_param = 'limit'
-    page_size = 100
-    pagination_type = 'item'
+CF_HOST_PAGINATION_OPTIONS = {
+    PAGE_PARAM: 'offset',
+    PAGE_SIZE_PARAM: 'limit',
+    PAGE_SIZE: 100,
+    PAGINATION_TYPE: PaginationType.ITEM,
+    RESULTS_KEY: None,
+}
+
+
+def cloudflare_host_paginated_results(fn, args=(), kwargs=None):
+    return PaginatedResults(fn, args=args, kwargs=kwargs,
+                            **CF_HOST_PAGINATION_OPTIONS)
 
 
 class CloudFlareHostService(HTTPServiceClient):
@@ -179,7 +195,7 @@ class CloudFlareHostService(HTTPServiceClient):
 
     def zone_list(self, zone_name=None, zone_status=None, sub_id=None,
                   sub_status=None, offset=0,
-                  limit=CloudFlareHostPageIterator.page_size):
+                  limit=CF_HOST_PAGINATION_OPTIONS[PAGE_SIZE]):
         data = {
             'act': 'zone_list',
             'limit': limit,
