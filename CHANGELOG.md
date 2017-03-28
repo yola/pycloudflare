@@ -1,5 +1,11 @@
 # Changelog
 
+## DEV
+
+* Remove `pycloudflare.pagination`, in favour of Demands' pagination.
+* Switch to 1-based indexing. Previously, page 0 and 1 would have
+  returned the same content, leading to some duplication in results.
+
 ## 0.3.4
 
 * Add `models.Zone.get_ssl_verification_info` method.
