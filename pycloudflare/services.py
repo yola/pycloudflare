@@ -35,7 +35,7 @@ class CloudFlareService(HTTPServiceClient):
         }
         return self.get(base_url + '?' + urlencode(params))
 
-    def get_zones(self, page=0, per_page=CloudFlarePageIterator.page_size):
+    def get_zones(self, page=1, per_page=CloudFlarePageIterator.page_size):
         return self._get_paginated('zones', page, per_page)
 
     def get_zone(self, zone_id):
@@ -49,7 +49,7 @@ class CloudFlareService(HTTPServiceClient):
 
         return result[0]
 
-    def get_zone_settings(self, zone_id, page=0,
+    def get_zone_settings(self, zone_id, page=1,
                           per_page=CloudFlarePageIterator.page_size):
         url = 'zones/%s/settings' % zone_id
         return self._get_paginated(url, page, per_page)
@@ -77,7 +77,7 @@ class CloudFlareService(HTTPServiceClient):
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)
 
-    def get_dns_records(self, zone_id, page=0,
+    def get_dns_records(self, zone_id, page=1,
                         per_page=CloudFlarePageIterator.page_size):
         url = 'zones/%s/dns_records' % zone_id
         return self._get_paginated(url, page, per_page)

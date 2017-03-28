@@ -26,7 +26,7 @@ class PaginatedAPIIterator(object):
 
     def page_ids(self):
         if self.pagination_type == 'page':
-            return count()
+            return count(1)
         if self.pagination_type == 'item':
             return count(0, self.page_size)
         raise ValueError('Unknown pagination_type')

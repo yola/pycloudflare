@@ -23,6 +23,7 @@ class PagitationTestsMixin(object):
 class PagePaginationTest(TestCase, PagitationTestsMixin):
     def setUp(self):
         def get(url, page, page_size):
+            page -= 1  # Map to our 0-indexed responses list
             start = page * page_size
             end = start + page_size
             return self.responses[start:end]
