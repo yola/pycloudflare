@@ -1,6 +1,6 @@
 # Changelog
 
-## DEV
+## 0.4.0
 
 * Remove `pycloudflare.pagination`, in favour of Demands' pagination.
 * Switch to 1-based indexing. Previously, page 0 and 1 would have
