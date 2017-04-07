@@ -5,7 +5,7 @@ from property_caching import (
 from six import iteritems, itervalues
 
 from pycloudflare.services import (
-    CloudFlareHostService, CloudFlarePageIterator, CloudFlareService)
+    CloudFlareHostService, CloudFlareService, cloudflare_paginated_results)
 
 
 class User(object):
@@ -53,7 +53,7 @@ class User(object):
         return list(self.iter_zones())
 
     def iter_zones(self):
-        for zone in CloudFlarePageIterator(self._service.get_zones):
+        for zone in cloudflare_paginated_results(self._service.get_zones):
             yield Zone(self, zone)
 
     def get_zone_by_name(self, name):
@@ -107,7 +107,7 @@ class Zone(object):
         return ZoneSettings(self)
 
     def iter_records(self):
-        for record in CloudFlarePageIterator(
+        for record in cloudflare_paginated_results(
                 self._service.get_dns_records, args=(self.id,)):
             yield Record(self, record)
 
@@ -168,7 +168,7 @@ class ZoneSettings(object):
 
     def _get_settings(self):
         self._settings = {}
-        for setting in CloudFlarePageIterator(
+        for setting in cloudflare_paginated_results(
                 self._service.get_zone_settings, args=(self.zone.id,)):
             self._settings[setting['id']] = setting
 

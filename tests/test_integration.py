@@ -5,8 +5,8 @@ from demands import HTTPServiceError
 
 from pycloudflare.models import User
 from pycloudflare.services import (
-    CloudFlareHostPageIterator, CloudFlareHostService, CloudFlarePageIterator,
-    CloudFlareService, ZoneNotFound)
+    CloudFlareHostService, CloudFlareService, ZoneNotFound,
+    cloudflare_paginated_results, cloudflare_host_paginated_results)
 
 
 TEST_USER = {}
@@ -25,7 +25,7 @@ def setUpModule():
 
 def tearDownModule():
     cf = cf_service()
-    for zone in CloudFlarePageIterator(cf.get_zones):
+    for zone in cloudflare_paginated_results(cf.get_zones):
         cf.delete_zone(zone['id'])
 
 
@@ -53,7 +53,7 @@ class ZoneTest(TestCase):
                 'ttl': 1,
             })
         except HTTPServiceError:
-            for record in CloudFlarePageIterator(
+            for record in cloudflare_paginated_results(
                     cls.cf.get_dns_records, args=(cls.zone_id,)):
                 if record['name'] == 'foo.ex.com':
                     break
@@ -106,11 +106,11 @@ class ZoneTest(TestCase):
 
     def test_get_ssl_verification_info(self):
         self.cfh.zone_set(
-            'example1.org', self.user['user_key'], ['www.example1.org'],
-            'resolve-to.example1.org'
+            'example2.org', self.user['user_key'], ['www.example2.org'],
+            'resolve-to.example2.org'
         )
 
-        zone_id = self.cf.get_zone_by_name('example1.org')['id']
+        zone_id = self.cf.get_zone_by_name('example2.org')['id']
         self.cf.set_zone_setting(zone_id, 'ssl', 'full')
         ssl_info = self.cf.get_ssl_verification_info(zone_id)
         self.assertIsInstance(ssl_info, list)
@@ -156,7 +156,7 @@ class HostZonesTest(TestCase):
         self.user = self.cfh.user_lookup(email=TEST_USER['email'])
 
     def test_zone_list(self):
-        zones = CloudFlareHostPageIterator(self.cfh.zone_list)
+        zones = cloudflare_host_paginated_results(self.cfh.zone_list)
         try:
             zone = next(iter(zones))
         except StopIteration:
@@ -166,24 +166,24 @@ class HostZonesTest(TestCase):
 
     def test_full_zone_set(self):
         response = self.cfh.full_zone_set(
-            'example1.org', self.user['user_key'])
+            'example2.org', self.user['user_key'])
         self.assertIsInstance(response, dict)
 
     def test_zone_set(self):
         expected_response = {
             'hosted_cnames': {
-                'www.example1.org': 'resolve-to.example1.org'
+                'www.example2.org': 'resolve-to.example2.org'
             },
-            'zone_name': 'example1.org',
+            'zone_name': 'example2.org',
             'forward_tos': {
-                'www.example1.org': 'www.example1.org.cdn.cloudflare.net'
+                'www.example2.org': 'www.example2.org.cdn.cloudflare.net'
             },
-            'resolving_to': 'resolve-to.example1.org'
+            'resolving_to': 'resolve-to.example2.org'
         }
 
         response = self.cfh.zone_set(
-            'example1.org', self.user['user_key'], ['www.example1.org'],
-            'resolve-to.example1.org'
+            'example2.org', self.user['user_key'], ['www.example2.org'],
+            'resolve-to.example2.org'
         )
         self.assertEqual(response, expected_response)
 
