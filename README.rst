@@ -4,7 +4,22 @@ pycloudflare
 
 |Build Status|
 
-A Python client for CloudFlare
+A Python client for CloudFlare API v4 and Host API.
+
+It provides two levels of integration against the CloudFlare API:
+
+#. A low level API, with one method per API endpoint
+   (``pycloudflare.services``).
+#. A high level ORM API (``pycloudflare.models``).
+
+Only a subset of the CloudFlare API is currently supported:
+
+* Users
+* Zones
+* Zone Settings
+* DNS Records
+* User creation & authentication through CloudFlare's partner-facing
+  Host API.
 
 Usage
 -----
