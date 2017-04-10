@@ -128,6 +128,26 @@ class FakeService(object):
                 },
                 'ssl': {'id': 'ssl', 'editable': True},
             },
+            '_page_rules': [
+                {
+                    'id': '9a7806061c88ada191ed06f989cc3dac',
+                    'targets': [{
+                        'target': 'url',
+                        'constraint': {
+                          'operator': 'matches',
+                          'value': '*example.com/images/*',
+                        },
+                    }],
+                    'actions': [{
+                        'id': 'always_online',
+                        'value': 'on',
+                    }],
+                    'priority': 1,
+                    'status': 'active',
+                    'modified_on': '2014-01-01T05:20:00.12345Z',
+                    'created_on': '2014-01-01T05:20:00.12345Z',
+                },
+            ],
         }
         self.zones[id_] = zone
         return zone
@@ -213,6 +233,24 @@ class FakeService(object):
 
     def update_dns_record(self, zone_id, record_id, data):
         return self._update_object('_records', zone_id, record_id, data)
+
+    def create_page_rule(self, zone_id, data):
+        data.update({
+            'id': uuid4().hex,
+            'created_on': '2014-01-01T05:20:00.12345Z',
+            'modified_on': '2014-01-01T05:20:00.12345Z',
+        })
+        self.zones[zone_id]['_page_rules'].append(data)
+        return deepcopy(data)
+
+    def get_page_rules(self, zone_id, page=1, per_page=50):
+        return self._get_object('_page_rules', zone_id, page, per_page)
+
+    def delete_page_rule(self, zone_id, page_rule_id):
+        return self._delete_object('_page_rules', zone_id, page_rule_id)
+
+    def update_page_rule(self, zone_id, page_rule_id, data):
+        return self._update_object('_page_rules', zone_id, page_rule_id, data)
 
     def purge_cache(self, zone_id, files=None, tags=None):
         return

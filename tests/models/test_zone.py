@@ -1,6 +1,6 @@
 from six import string_types
 
-from pycloudflare.models import Record, User, Zone
+from pycloudflare.models import PageRule, Record, User, Zone
 from tests.models import FakedServiceTestCase
 
 
@@ -75,6 +75,20 @@ class TestZoneRecords(FakedServiceTestCase):
         self.assertIsInstance(self.zone.records, dict)
         self.assertIsInstance(self.zone.records['example.com'], list)
         self.assertIsInstance(self.zone.records['example.com'][0], Record)
+
+
+class TestZonePageRules(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.zone = self.user.get_zone_by_name('example.com')
+
+    def test_iter_page_rules_yields_page_rule_objects(self):
+        page_rule = next(self.zone.iter_page_rules())
+        self.assertIsInstance(page_rule, PageRule)
+
+    def test_page_rules_returns_list_of_page_rule_objects(self):
+        self.assertIsInstance(self.zone.page_rules, list)
+        self.assertIsInstance(self.zone.page_rules[0], PageRule)
 
 
 class TestSetCNameZone(FakedServiceTestCase):

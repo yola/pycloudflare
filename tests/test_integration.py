@@ -59,6 +59,10 @@ class ZoneTest(TestCase):
                     break
         cls.record_id = record['id']
 
+        for page_rule in cloudflare_paginated_results(
+                cls.cf.get_page_rules, args=(cls.zone_id,)):
+            cls.cf.delete_page_rule(cls.zone_id, page_rule['id'])
+
         cls.cfh = CloudFlareHostService()
         cls.user = cls.cfh.user_lookup(email=TEST_USER['email'])
 
@@ -148,6 +152,23 @@ class ZoneTest(TestCase):
         })
         self.assertIsInstance(record, dict)
         self.cf.delete_dns_record(self.zone_id, record['id'])
+
+    def test_create_delete_page_rule(self):
+        page_rule = self.cf.create_page_rule(self.zone_id, {
+            'targets': [{
+                'target': 'url',
+                'constraint': {
+                    'operator': 'matches',
+                    'value': '*ex.com/images/*'
+                },
+            }],
+            'actions': [{
+                'id': 'always_online',
+                'value': 'on'
+            }],
+        })
+        self.assertIsInstance(page_rule, dict)
+        self.cf.delete_page_rule(self.zone_id, page_rule['id'])
 
 
 class HostZonesTest(TestCase):

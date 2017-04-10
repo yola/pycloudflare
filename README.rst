@@ -18,6 +18,7 @@ Only a subset of the CloudFlare API is currently supported:
 * Zones
 * Zone Settings
 * DNS Records
+* Page Rules
 * User creation & authentication through CloudFlare's partner-facing
   Host API.
 

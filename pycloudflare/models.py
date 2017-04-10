@@ -149,6 +149,45 @@ class Zone(object):
         clear_property_cache(self, 'records')
         return Record(self, record)
 
+    def iter_page_rules(self):
+        for page_rule in cloudflare_paginated_results(
+                self._service.get_page_rules, args=(self.id,)):
+            yield PageRule(self, page_rule)
+
+    @cached_property
+    def page_rules(self):
+        return sorted(self.iter_page_rules(), key=lambda pr: pr.priority)
+
+    def create_page_rule(self, targets=None, url_matches=None, actions=(),
+                         priority=1, status='active'):
+        """
+        Create a PageRule.
+        Either the targets can be explicitly spelled out (the JSON dictionary
+        in the CF API), or the convenience parameter url_matches can be
+        used to generate the targets parameter.
+        The other parameters map directly to the CF API.
+        """
+        if url_matches:
+            if targets:
+                raise ValueError(
+                    'Only one of targets and url_matches can be specified')
+            targets = [{
+                'target': 'url',
+                'constraint': {
+                    'operator': 'matches',
+                    'value': url_matches,
+                },
+            }]
+        data = {
+            'targets': targets,
+            'actions': actions,
+            'priority': priority,
+            'status': status,
+        }
+        page_rule = self._service.create_page_rule(self.id, data)
+        clear_property_cache(self, 'page_rules')
+        return PageRule(self, page_rule)
+
     def purge_cache(self, files=None, tags=None):
         self._service.purge_cache(self.id, files=files, tags=tags)
 
@@ -260,3 +299,19 @@ class Record(PerZoneObject):
     def __repr__(self):
         return 'Record<%s %s IN %s %s>' % (self.name, self.ttl, self.type,
                                            self.content)
+
+
+class PageRule(PerZoneObject):
+    def _save(self):
+        result = self._service.update_page_rule(
+            self.zone.id, self.id, self._data)
+        if result['priority'] != self._saved_data['priority']:
+            clear_property_cache(self.zone, 'page_rules')
+        return result
+
+    def delete(self):
+        self._service.delete_page_rule(self.zone.id, self.id)
+        clear_property_cache(self.zone, 'page_rules')
+
+    def __repr__(self):
+        return 'PageRule <%s>' % self.id
