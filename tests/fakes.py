@@ -185,25 +185,34 @@ class FakeService(object):
         self.zones[zone_id]['_records'].append(data)
         return deepcopy(data)
 
-    def get_dns_records(self, zone_id, page=1, per_page=50):
+    def _get_object(self, key, zone_id, page, per_page):
         page -= 1  # Map to our 0-indexed list
-        return deepcopy(self.zones[zone_id]['_records'][page:page + per_page])
+        return deepcopy(self.zones[zone_id][key][page:page + per_page])
 
-    def delete_dns_record(self, zone_id, record_id):
-        records = [record for record in self.zones[zone_id]['_records']
-                   if record['id'] != record_id]
-        if len(records) == len(self.zones[zone_id]['_records']):
+    def _delete_object(self, key, zone_id, object_id):
+        objects = [obj for obj in self.zones[zone_id][key]
+                   if obj['id'] != object_id]
+        if len(objects) == len(self.zones[zone_id][key]):
             raise Exception('Not Found')
-        self.zones[zone_id]['_records'] = records
+        self.zones[zone_id][key] = objects
 
-    def update_dns_record(self, zone_id, record_id, data):
-        for record in self.zones[zone_id]['_records']:
-            if record['id'] == record_id:
+    def _update_object(self, key, zone_id, object_id, data):
+        for obj in self.zones[zone_id][key]:
+            if obj['id'] == object_id:
                 break
         else:
             raise Exception('Not Found')
-        record.update(data)
-        return deepcopy(record)
+        obj.update(data)
+        return deepcopy(obj)
+
+    def get_dns_records(self, zone_id, page=1, per_page=50):
+        return self._get_object('_records', zone_id, page, per_page)
+
+    def delete_dns_record(self, zone_id, record_id):
+        return self._delete_object('_records', zone_id, record_id)
+
+    def update_dns_record(self, zone_id, record_id, data):
+        return self._update_object('_records', zone_id, record_id, data)
 
     def purge_cache(self, zone_id, files=None, tags=None):
         return

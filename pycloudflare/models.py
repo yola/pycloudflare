@@ -204,7 +204,7 @@ class ZoneSettings(object):
         return 'ZoneSettings<%s>' % self.zone.name
 
 
-class Record(object):
+class PerZoneObject(object):
     _data = ()
     _own_attrs = ('zone', '_service', '_data', '_saved_data')
 
@@ -220,7 +220,7 @@ class Record(object):
 
     def __setattr__(self, name, value):
         if name in self._own_attrs:
-            return super(Record, self).__setattr__(name, value)
+            return super(PerZoneObject, self).__setattr__(name, value)
         if name in self._data:
             self._data[name] = value
         else:
@@ -232,11 +232,26 @@ class Record(object):
 
     def save(self):
         if self._saved_data != self._data:
-            result = self._service.update_dns_record(self.zone.id, self.id,
-                                                     self._data)
-            if self._data['name'] != self._saved_data['name']:
-                clear_property_cache(self.zone, 'records')
-            self._set_data(result)
+            self._set_data(self._save())
+
+    def _save(self):
+        """Save _data to CloudFlare, and return the result"""
+        raise NotImplemented()
+
+    def delete(self):
+        raise NotImplemented()
+
+    def __repr__(self):
+        raise NotImplemented()
+
+
+class Record(PerZoneObject):
+    def _save(self):
+        result = self._service.update_dns_record(self.zone.id, self.id,
+                                                 self._data)
+        if result['name'] != self._saved_data['name']:
+            clear_property_cache(self.zone, 'records')
+        return result
 
     def delete(self):
         self._service.delete_dns_record(self.zone.id, self.id)
