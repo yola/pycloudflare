@@ -1,5 +1,9 @@
 # Changelog
 
+## DEV
+
+* Add modelling and service methods for PageRules.
+
 ## 0.4.0
 
 * Remove `pycloudflare.pagination`, in favour of Demands' pagination.

@@ -104,6 +104,24 @@ class CloudFlareService(HTTPServiceClient):
     def delete_dns_record(self, zone_id, record_id):
         return self.delete('zones/%s/dns_records/%s' % (zone_id, record_id))
 
+    def get_page_rules(self, zone_id, page=1,
+                       per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
+        url = 'zones/%s/pagerules' % zone_id
+        return self._get_paginated(url, page, per_page)
+
+    def get_page_rule(self, zone_id, rule_id):
+        return self.get('zones/%s/pagerules/%s' % (zone_id, rule_id))
+
+    def create_page_rule(self, zone_id, content):
+        return self.post('zones/%s/pagerules' % zone_id, json=content)
+
+    def update_page_rule(self, zone_id, rule_id, content):
+        url = 'zones/%s/pagerules/%s' % (zone_id, rule_id)
+        return self.patch(url, json=content)
+
+    def delete_page_rule(self, zone_id, rule_id):
+        return self.delete('zones/%s/pagerules/%s' % (zone_id, rule_id))
+
     def purge_cache(self, zone_id, files=None, tags=None):
         data = {}
         if files:

@@ -149,6 +149,45 @@ class Zone(object):
         clear_property_cache(self, 'records')
         return Record(self, record)
 
+    def iter_page_rules(self):
+        for page_rule in cloudflare_paginated_results(
+                self._service.get_page_rules, args=(self.id,)):
+            yield PageRule(self, page_rule)
+
+    @cached_property
+    def page_rules(self):
+        return sorted(self.iter_page_rules(), key=lambda pr: pr.priority)
+
+    def create_page_rule(self, targets=None, url_matches=None, actions=(),
+                         priority=1, status='active'):
+        """
+        Create a PageRule.
+        Either the targets can be explicitly spelled out (the JSON dictionary
+        in the CF API), or the convenience parameter url_matches can be
+        used to generate the targets parameter.
+        The other parameters map directly to the CF API.
+        """
+        if url_matches:
+            if targets:
+                raise ValueError(
+                    'Only one of targets and url_matches can be specified')
+            targets = [{
+                'target': 'url',
+                'constraint': {
+                    'operator': 'matches',
+                    'value': url_matches,
+                },
+            }]
+        data = {
+            'targets': targets,
+            'actions': actions,
+            'priority': priority,
+            'status': status,
+        }
+        page_rule = self._service.create_page_rule(self.id, data)
+        clear_property_cache(self, 'page_rules')
+        return PageRule(self, page_rule)
+
     def purge_cache(self, files=None, tags=None):
         self._service.purge_cache(self.id, files=files, tags=tags)
 
@@ -204,7 +243,7 @@ class ZoneSettings(object):
         return 'ZoneSettings<%s>' % self.zone.name
 
 
-class Record(object):
+class PerZoneObject(object):
     _data = ()
     _own_attrs = ('zone', '_service', '_data', '_saved_data')
 
@@ -220,7 +259,7 @@ class Record(object):
 
     def __setattr__(self, name, value):
         if name in self._own_attrs:
-            return super(Record, self).__setattr__(name, value)
+            return super(PerZoneObject, self).__setattr__(name, value)
         if name in self._data:
             self._data[name] = value
         else:
@@ -232,11 +271,26 @@ class Record(object):
 
     def save(self):
         if self._saved_data != self._data:
-            result = self._service.update_dns_record(self.zone.id, self.id,
-                                                     self._data)
-            if self._data['name'] != self._saved_data['name']:
-                clear_property_cache(self.zone, 'records')
-            self._set_data(result)
+            self._set_data(self._save())
+
+    def _save(self):
+        """Save _data to CloudFlare, and return the result"""
+        raise NotImplemented()
+
+    def delete(self):
+        raise NotImplemented()
+
+    def __repr__(self):
+        raise NotImplemented()
+
+
+class Record(PerZoneObject):
+    def _save(self):
+        result = self._service.update_dns_record(self.zone.id, self.id,
+                                                 self._data)
+        if result['name'] != self._saved_data['name']:
+            clear_property_cache(self.zone, 'records')
+        return result
 
     def delete(self):
         self._service.delete_dns_record(self.zone.id, self.id)
@@ -245,3 +299,19 @@ class Record(object):
     def __repr__(self):
         return 'Record<%s %s IN %s %s>' % (self.name, self.ttl, self.type,
                                            self.content)
+
+
+class PageRule(PerZoneObject):
+    def _save(self):
+        result = self._service.update_page_rule(
+            self.zone.id, self.id, self._data)
+        if result['priority'] != self._saved_data['priority']:
+            clear_property_cache(self.zone, 'page_rules')
+        return result
+
+    def delete(self):
+        self._service.delete_page_rule(self.zone.id, self.id)
+        clear_property_cache(self.zone, 'page_rules')
+
+    def __repr__(self):
+        return 'PageRule <%s>' % self.id
