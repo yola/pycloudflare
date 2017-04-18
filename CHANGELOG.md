@@ -1,6 +1,6 @@
 # Changelog
 
-## DEV
+## 0.4.1
 
 * Add modelling and service methods for PageRules.
 
