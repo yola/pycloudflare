@@ -29,7 +29,7 @@ Get all our zones at CloudFlare
 
 .. code:: python
 
-    >>> cf = CloudFlareService()
+    >>> cf = CloudFlareService(api_key, email)
     >>> for domain in cf.get_zones():
     >>>     print domain['name'], domain['id']
 
