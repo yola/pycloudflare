@@ -5,7 +5,8 @@ from property_caching import (
 from six import iteritems, itervalues
 
 from pycloudflare.services import (
-    CloudFlareHostService, CloudFlareService, cloudflare_paginated_results)
+    CloudFlareHostService, CloudFlareService, cloudflare_paginated_results,
+    SSLUnavailable)
 
 
 class User(object):
