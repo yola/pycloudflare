@@ -8,6 +8,7 @@ from pycloudflare.exceptions import SSLUnavailable
 from pycloudflare.services import (
     CloudFlareHostService, CloudFlareService, cloudflare_paginated_results,
     HTTPServiceError)
+from pycloudflare.utils import _find_error_code
 
 
 class User(object):
@@ -197,8 +198,8 @@ class Zone(object):
         try:
             return self._service.get_ssl_verification_info(self.id)
         except HTTPServiceError as e:
-            if e.response.status_code == 400:
-                raise SSLUnavailable
+            if _find_error_code(e.response, err_code=1001):
+                raise SSLUnavailable()
 
     def __repr__(self):
         return 'Zone<%s>' % self.name
