@@ -196,7 +196,7 @@ class Zone(object):
     def get_ssl_verification_info(self):
         try:
             return self._service.get_ssl_verification_info(self.id)
-        except HTTPServiceError, e:
+        except HTTPServiceError as e:
             if e.response.status_code == 400:
                 raise SSLUnavailable
 
