@@ -4,7 +4,7 @@ from property_caching import (
     cached_property, clear_property_cache, set_property_cache)
 from six import iteritems, itervalues
 
-from cloudflare.exceptions import SSLUnavailable
+from pycloudflare.exceptions import SSLUnavailable
 from pycloudflare.services import (
     CloudFlareHostService, CloudFlareService, cloudflare_paginated_results,
     HTTPServiceError)
