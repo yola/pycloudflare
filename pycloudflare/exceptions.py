@@ -1,0 +1,2 @@
+class SSLUnavailable(Exception):
+    pass

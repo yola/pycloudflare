@@ -192,7 +192,11 @@ class Zone(object):
         self._service.purge_cache(self.id, files=files, tags=tags)
 
     def get_ssl_verification_info(self):
-        return self._service.get_ssl_verification_info(self.id)
+        try:
+            return self._service.get_ssl_verification_info(self.id)
+        except HTTPServiceError, e:
+            if e.response.status_code == 400:
+                raise SSLUnavailable
 
     def __repr__(self):
         return 'Zone<%s>' % self.name
