@@ -134,8 +134,6 @@ class TestGetSSLVerificationInfoForZoneWithError(FakedServiceTestCase):
         zone = self.user.create_cname_zone(
             'example.org', ['cname.example.org'], 'resolve-to.example.org')
         zone = self.user.get_zone_by_name('example.org')
-        zone.settings.ssl = 'full'
-        zone.settings.save()
         zone._service = Mock()
 
         data = {'errors': [{'code': 1001, 'msg': 'msg'}]}
