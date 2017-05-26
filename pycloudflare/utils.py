@@ -1,3 +1,5 @@
+from functools import wraps
+
 from pycloudflare.exceptions import SSLUnavailable
 from pycloudflare.services import HTTPServiceError
 
@@ -8,6 +10,7 @@ errors_mapping = {
 
 
 def translate_errors(f):
+    @wraps(f)
     def _wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
