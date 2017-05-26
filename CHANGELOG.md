@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.0
+## 0.4.2
 
 * Raise `exceptions.SSLUnavailable` if SSL info is not available for zone.
 
