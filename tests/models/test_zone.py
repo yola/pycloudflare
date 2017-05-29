@@ -1,6 +1,9 @@
+from mock import Mock
 from six import string_types
 
+from pycloudflare.exceptions import SSLUnavailable
 from pycloudflare.models import PageRule, Record, User, Zone
+from pycloudflare.services import HTTPServiceError
 from tests.models import FakedServiceTestCase
 
 
@@ -123,6 +126,24 @@ class TestGetSSLVerificationInfoForZone(FakedServiceTestCase):
 
     def test_ssl_verification_info_is_returned(self):
         self.assertEqual(self.result, 'ssl_verification_info')
+
+
+class TestGetSSLVerificationInfoForZoneWithError(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        zone = self.user.create_cname_zone(
+            'example.org', ['cname.example.org'], 'resolve-to.example.org')
+        zone = self.user.get_zone_by_name('example.org')
+        zone._service = Mock()
+
+        data = {'errors': [{'code': 1001, 'msg': 'msg'}]}
+        zone._service.get_ssl_verification_info.side_effect = (
+            HTTPServiceError(response=Mock(data=data))
+        )
+        self.zone = zone
+
+    def test_proper_exception_is_raised(self):
+        self.assertRaises(SSLUnavailable, self.zone.get_ssl_verification_info)
 
 
 class TestPurgeZone(FakedServiceTestCase):

@@ -4,8 +4,10 @@ from property_caching import (
     cached_property, clear_property_cache, set_property_cache)
 from six import iteritems, itervalues
 
+from pycloudflare.exceptions import SSLUnavailable
 from pycloudflare.services import (
     CloudFlareHostService, CloudFlareService, cloudflare_paginated_results)
+from pycloudflare.utils import translate_errors
 
 
 class User(object):
@@ -191,6 +193,7 @@ class Zone(object):
     def purge_cache(self, files=None, tags=None):
         self._service.purge_cache(self.id, files=files, tags=tags)
 
+    @translate_errors(1001, SSLUnavailable)
     def get_ssl_verification_info(self):
         return self._service.get_ssl_verification_info(self.id)
 

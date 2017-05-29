@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.2
+
+* Raise `exceptions.SSLUnavailable` if SSL info is not available for zone.
+
 ## 0.4.1
 
 * Add modelling and service methods for PageRules.
