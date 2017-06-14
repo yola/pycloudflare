@@ -18,10 +18,12 @@ def translate_errors(err_code, exc_class):
 
 
 def _translate_error(exc, err_code, exc_class):
-    if exc.response.status_code != 400:
+    try:
+        data = exc.response.json()
+    except AttributeError:
+        # If response is not JSON, this error is not translatable.
         raise exc
 
-    data = exc.response.json()
     errors = data.get('errors', [])
 
     for error in errors:
