@@ -20,7 +20,7 @@ def translate_errors(err_code, exc_class):
 def _translate_error(exc, err_code, exc_class):
     try:
         data = exc.response.json()
-    except AttributeError:
+    except ValueError:
         # If response is not JSON, this error is not translatable.
         raise exc
 
