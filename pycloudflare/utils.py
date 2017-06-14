@@ -1,5 +1,4 @@
 from functools import wraps
-import json
 
 from pycloudflare.services import HTTPServiceError
 
@@ -19,7 +18,7 @@ def translate_errors(err_code, exc_class):
 
 
 def _translate_error(exc, err_code, exc_class):
-    data = json.loads(exc.response.content)
+    data = exc.response.json()
     errors = data.get('errors', [])
 
     for error in errors:
