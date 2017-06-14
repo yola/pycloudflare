@@ -18,6 +18,9 @@ def translate_errors(err_code, exc_class):
 
 
 def _translate_error(exc, err_code, exc_class):
+    if exc.response.status_code != 400:
+        raise exc
+
     data = exc.response.json()
     errors = data.get('errors', [])
 
