@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3
+
+* Fix bug in HTTP errors translation.
+
 ## 0.4.2
 
 * Raise `exceptions.SSLUnavailable` if SSL info is not available for zone.
