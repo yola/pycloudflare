@@ -2,7 +2,7 @@
 
 ## 0.4.3
 
-* Fixed bug in HTTP errors processing.
+* Fix bug in HTTP errors translation.
 
 ## 0.4.2
 
