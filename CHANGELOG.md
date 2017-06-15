@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.3
+
+* Fixed bug in HTTP errors processing.
+
 ## 0.4.2
 
 * Raise `exceptions.SSLUnavailable` if SSL info is not available for zone.
