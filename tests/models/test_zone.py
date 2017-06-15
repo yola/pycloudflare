@@ -138,7 +138,7 @@ class TestGetSSLVerificationInfoForZoneWithError(FakedServiceTestCase):
 
         data = {'errors': [{'code': 1001, 'msg': 'msg'}]}
         zone._service.get_ssl_verification_info.side_effect = (
-            HTTPServiceError(response=Mock(data=data))
+            HTTPServiceError(response=Mock(json=Mock(return_value=data)))
         )
         self.zone = zone
 

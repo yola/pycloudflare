@@ -18,7 +18,12 @@ def translate_errors(err_code, exc_class):
 
 
 def _translate_error(exc, err_code, exc_class):
-    data = exc.response.data
+    try:
+        data = exc.response.json()
+    except ValueError:
+        # If response is not JSON, this error is not translatable.
+        raise exc
+
     errors = data.get('errors', [])
 
     for error in errors:
