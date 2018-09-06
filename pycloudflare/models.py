@@ -197,6 +197,11 @@ class Zone(object):
     def get_ssl_verification_info(self):
         return self._service.get_ssl_verification_info(self.id)
 
+    def re_verify(self):
+        for state in (False, True):
+            self._service.update_ssl_universal_settings(
+                self.id, {'enabled': state})
+
     def __repr__(self):
         return 'Zone<%s>' % self.name
 
