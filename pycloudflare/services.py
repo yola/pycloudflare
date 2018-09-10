@@ -132,6 +132,13 @@ class CloudFlareService(HTTPServiceClient):
             data['purge_everything'] = True
         return self.delete('zones/%s/purge_cache' % zone_id, json=data)
 
+    def get_ssl_universal_settings(self, zone_id):
+        return self.get('zones/%s/ssl/universal/settings' % zone_id)
+
+    def update_ssl_universal_settings(self, zone_id, content):
+        return self.patch(
+            'zones/%s/ssl/universal/settings' % zone_id, json=content)
+
     def get_ssl_verification_info(self, zone_id):
         return self.get('zones/%s/ssl/verification' % zone_id)
 

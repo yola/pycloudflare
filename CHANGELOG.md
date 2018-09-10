@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.4
+
+* Allow toggling Universal SSL on a CNAME zone, to re-verify it.
+
 ## 0.4.3
 
 * Fix bug in HTTP errors translation.
