@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.5
+
+* Insert a delay in the Universal SSL toggling, so it takes effect.
+
 ## 0.4.4
 
 * Allow toggling Universal SSL on a CNAME zone, to re-verify it.
