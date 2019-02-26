@@ -1,4 +1,5 @@
 from copy import deepcopy
+from time import sleep
 
 from property_caching import (
     cached_property, clear_property_cache, set_property_cache)
@@ -202,9 +203,20 @@ class Zone(object):
 
         This will leave SSL enabled, regardless of the previous state.
         """
-        for state in (False, True):
-            self._service.update_ssl_universal_settings(
-                self.id, {'enabled': state})
+        self._service.update_ssl_universal_settings(
+            self.id, {'enabled': False})
+        # This is asynchronous on CF's side. So probe until it seems to have
+        # been deprovisioned, and then wait a little longer to be safe.
+        for i in range(5):
+            sleep(1)
+            try:
+                self.get_ssl_verification_info()
+            except SSLUnavailable:
+                sleep(1)
+                break
+
+        self._service.update_ssl_universal_settings(
+            self.id, {'enabled': True})
 
     def __repr__(self):
         return 'Zone<%s>' % self.name
