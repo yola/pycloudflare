@@ -74,10 +74,12 @@ class CloudFlareService(HTTPServiceClient):
         url = 'zones/%s/settings/%s' % (zone_id, setting)
         return self.patch(url, json={'value': value})
 
-    def create_zone(self, name, jump_start=False, organization=None):
+    def create_zone(self, name, jump_start=False, zone_type='full',
+                    organization=None):
         data = {
             'name': name,
             'jump_start': jump_start,
+            'type': zone_type
         }
         if organization:
             data['organization'] = {'id': organization}

@@ -81,9 +81,11 @@ class User(object):
             zone_name, self.user_key, subdomains, resolve_to)
         return result
 
-    def create_zone(self, name, jump_start=False, organization=None):
-        zone = self._service.create_zone(name=name, jump_start=jump_start,
-                                         organization=organization)
+    def create_zone(self, name, jump_start=False, zone_type='full',
+                    organization=None):
+        zone = self._service.create_zone(
+            name=name, jump_start=jump_start, zone_type=zone_type,
+            organization=organization)
         return Zone(self, zone)
 
     def __repr__(self):
