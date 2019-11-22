@@ -51,6 +51,10 @@ class TestCreateZone(FakedServiceTestCase):
     def test_repr_able(self):
         self.assertEqual(repr(self.zone), 'Zone<example.net>')
 
+    def able_to_set_zone_type(self):
+        self.zone = self.user.create_zone('example.net', zone_type='partial')
+        self.assertEqual(self.zone.type, 'test')
+
 
 class TestDeleteZone(FakedServiceTestCase):
     def setUp(self):

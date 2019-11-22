@@ -174,7 +174,8 @@ class FakeService(object):
     def get_ssl_verification_info(self, zone_id):
         return 'ssl_verification_info'
 
-    def create_zone(self, name, jump_start=False, organization=None):
+    def create_zone(self, name, jump_start=False, zone_type='full',
+                    organization=None):
         zone = self._add_zone(uuid4().hex, name)
         return self._clean_zone(zone)
 
