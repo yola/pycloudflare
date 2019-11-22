@@ -1,5 +1,9 @@
 # Changelog
 
+## DEV
+
+* Allow to specify zone type for `create_zone` API method.
+
 ## 0.4.5
 
 * Insert a delay in the Universal SSL toggling, so it takes effect.
