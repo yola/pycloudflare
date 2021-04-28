@@ -1,14 +1,14 @@
-from mock import patch
 from unittest import TestCase
 
 from pycloudflare.services import CloudFlareService
+from tests import PatchMixin
 
 
-class TestPurgeZoneCache(TestCase):
+class TestPurgeZoneCache(TestCase, PatchMixin):
 
     def setUp(self):
-        self.delete_mock = patch(
-            'pycloudflare.services.CloudFlareService.delete').start()
+        self.delete_mock = self._patch(
+            'pycloudflare.services.CloudFlareService.delete')
 
     def tearDown(self):
         self.delete_mock.stop()

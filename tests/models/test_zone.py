@@ -1,10 +1,11 @@
-from mock import Mock, patch
+from mock import Mock
 from six import string_types
 from unittest import TestCase
 
 from pycloudflare.exceptions import SSLUnavailable
 from pycloudflare.models import PageRule, Record, User, Zone
 from pycloudflare.services import HTTPServiceError
+from tests import PatchMixin
 from tests.models import FakedServiceTestCase
 
 
@@ -147,15 +148,12 @@ class TestGetSSLVerificationInfoForZoneWithError(FakedServiceTestCase):
         self.assertRaises(SSLUnavailable, self.zone.get_ssl_verification_info)
 
 
-class TestPurgeZone(TestCase):
+class TestPurgeZone(TestCase, PatchMixin):
 
     def setUp(self):
-        self.service_mock = patch(
-            'pycloudflare.models.CloudFlareService').start()
+        self.service_mock = serlf._patch(
+            'pycloudflare.models.CloudFlareService')
         self.zone = Zone(User('email', 'api_key'), {'id': 'zone_id'})
-
-    def tearDown(self):
-        self.service_mock.stop()
 
     def test_full_purge(self):
         self.zone.purge_cache()
