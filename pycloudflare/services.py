@@ -122,7 +122,7 @@ class CloudFlareService(HTTPServiceClient):
     def delete_page_rule(self, zone_id, rule_id):
         return self.delete('zones/%s/pagerules/%s' % (zone_id, rule_id))
 
-    def purge_cache(self, zone_id, files=None, tags=None):
+    def purge_cache(self, zone_id, files=None, tags=None, hosts=None):
         data = {}
         if files:
             data['files'] = files
@@ -130,6 +130,9 @@ class CloudFlareService(HTTPServiceClient):
             data['tags'] = tags
         if files is None and tags is None:
             data['purge_everything'] = True
+        if hosts:
+            data['hosts'] = hosts
+
         return self.delete('zones/%s/purge_cache' % zone_id, json=data)
 
     def get_ssl_universal_settings(self, zone_id):

@@ -252,5 +252,5 @@ class FakeService(object):
     def update_page_rule(self, zone_id, page_rule_id, data):
         return self._update_object('_page_rules', zone_id, page_rule_id, data)
 
-    def purge_cache(self, zone_id, files=None, tags=None):
+    def purge_cache(self, zone_id, files=None, tags=None, hosts=None):
         return
