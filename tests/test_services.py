@@ -1,4 +1,4 @@
-from mock import Mock, patch
+from mock import patch
 from unittest import TestCase
 
 from pycloudflare.services import CloudFlareService
