@@ -151,7 +151,7 @@ class TestGetSSLVerificationInfoForZoneWithError(FakedServiceTestCase):
 class TestPurgeZone(TestCase, PatchMixin):
 
     def setUp(self):
-        self.service_mock = serlf._patch(
+        self.service_mock = self._patch(
             'pycloudflare.models.CloudFlareService')
         self.zone = Zone(User('email', 'api_key'), {'id': 'zone_id'})
 
