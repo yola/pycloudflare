@@ -128,10 +128,11 @@ class CloudFlareService(HTTPServiceClient):
             data['files'] = files
         if tags:
             data['tags'] = tags
-        if files is None and tags is None:
-            data['purge_everything'] = True
         if hosts:
             data['hosts'] = hosts
+
+        if not data:
+            data['purge_everything'] = True
 
         return self.delete('zones/%s/purge_cache' % zone_id, json=data)
 
