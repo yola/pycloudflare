@@ -191,8 +191,9 @@ class Zone(object):
         clear_property_cache(self, 'page_rules')
         return PageRule(self, page_rule)
 
-    def purge_cache(self, files=None, tags=None):
-        self._service.purge_cache(self.id, files=files, tags=tags)
+    def purge_cache(self, files=None, tags=None, hosts=None):
+        self._service.purge_cache(
+            self.id, files=files, tags=tags, hosts=hosts)
 
     @translate_errors(1001, SSLUnavailable)
     def get_ssl_verification_info(self):

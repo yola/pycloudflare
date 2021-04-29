@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0
+
+* Add optional `hosts` parameter to `CloudFlareService.purge_cache()` method.
+* Add optional `hosts` parameter to `models.Zone.purge_cache()` method.
+
 ## 0.4.5
 
 * Insert a delay in the Universal SSL toggling, so it takes effect.
