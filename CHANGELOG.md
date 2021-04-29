@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.6
+## 1.0.0
 
 * Add optional `hosts` parameter to `CloudFlareService.purge_cache()` method.
 * Add optional `hosts` parameter to `models.Zone.purge_cache()` method.

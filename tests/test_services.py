@@ -10,9 +10,6 @@ class TestPurgeZoneCache(TestCase, PatchMixin):
         self.delete_mock = self._patch(
             'pycloudflare.services.CloudFlareService.delete')
 
-    def tearDown(self):
-        self.delete_mock.stop()
-
     def test_full_purge(self):
         CloudFlareService('api_key', 'email').purge_cache('zone_id')
         self.delete_mock.assert_called_once_with(
