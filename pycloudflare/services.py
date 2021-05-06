@@ -58,10 +58,8 @@ class CloudFlareService(HTTPServiceClient):
 
         return result[0]
 
-    def get_zone_settings(self, zone_id, page=1,
-                          per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
-        url = 'zones/%s/settings' % zone_id
-        return self._get_paginated(url, page, per_page)
+    def get_zone_settings(self, zone_id):
+        return self.get('zones/%s/settings' % zone_id)
 
     def set_zone_settings(self, zone_id, items):
         data = {'items': items}

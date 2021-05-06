@@ -232,8 +232,7 @@ class ZoneSettings(object):
 
     def _get_settings(self):
         self._settings = {}
-        for setting in cloudflare_paginated_results(
-                self._service.get_zone_settings, args=(self.zone.id,)):
+        for setting in self._service.get_zone_settings(self.zone.id):
             self._settings[setting['id']] = setting
 
     def __getattr__(self, name):
