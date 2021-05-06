@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0
+* Remove pagination from `CloudFlareService.get_zone_settings()` since
+  the corresponding API isn't paginated.
+
 ## 1.0.0
 
 * Add optional `hosts` parameter to `CloudFlareService.purge_cache()` method.
