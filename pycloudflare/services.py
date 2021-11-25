@@ -144,6 +144,14 @@ class CloudFlareService(HTTPServiceClient):
     def get_ssl_verification_info(self, zone_id):
         return self.get('zones/%s/ssl/verification' % zone_id)
 
+    def create_custom_hostname(self, zone_id, hostname, ssl_settings):
+        data = {
+            'hostname': hostname,
+            'ssl': ssl_settings
+        }
+        return self.post(
+            'zones/{}/custom_hostnames'.format(zone_id), json=data)
+
 
 CF_HOST_PAGINATION_OPTIONS = {
     PAGE_PARAM: 'offset',
