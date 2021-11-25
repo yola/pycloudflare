@@ -3,3 +3,7 @@ class SSLUnavailable(Exception):
     it can't be verified any more.
     """
     pass
+
+
+class CustomHostnameNotFound(Exception):
+    pass
