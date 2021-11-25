@@ -2,6 +2,7 @@
 
 ## 2.1.0
 * Add `CloudFlareService.create_custom_hostname()`.
+* Add `CloudFlareService.get_custom_hostname_by_name()`.
 
 ## 2.0.0
 * Remove pagination from `CloudFlareService.get_zone_settings()` since

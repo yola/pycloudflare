@@ -5,6 +5,7 @@ from demands.pagination import (
 from six.moves.urllib.parse import urlencode
 
 from pycloudflare.config import get_config
+from pycloudflare.exceptions import CustomHostnameNotFound
 
 
 class ZoneNotFound(Exception):
@@ -151,6 +152,16 @@ class CloudFlareService(HTTPServiceClient):
         }
         return self.post(
             'zones/{}/custom_hostnames'.format(zone_id), json=data)
+
+    def get_custom_hostname_by_name(self, zone_id, hostname):
+        result = self.get(
+            'zones/{}/custom_hostnames'.format(zone_id),
+            params={'hostname': hostname})
+
+        if not result:
+            raise CustomHostnameNotFound()
+
+        return result[0]
 
 
 CF_HOST_PAGINATION_OPTIONS = {
