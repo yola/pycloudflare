@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.2.0
+* Add `CloudFlareService.delete_custom_hostname()`.
+
 ## 2.1.0
 * Add `CloudFlareService.create_custom_hostname()`.
 * Add `CloudFlareService.get_custom_hostname_by_name()`.
