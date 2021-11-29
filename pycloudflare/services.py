@@ -163,6 +163,10 @@ class CloudFlareService(HTTPServiceClient):
 
         return result[0]
 
+    def delete_custom_hostname(self, zone_id, hostname_id):
+        return self.delete(
+            'zones/{}/custom_hostnames/{}'.format(zone_id, hostname_id))
+
 
 CF_HOST_PAGINATION_OPTIONS = {
     PAGE_PARAM: 'offset',
