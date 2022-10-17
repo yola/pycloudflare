@@ -12,7 +12,7 @@ from tests.models import FakedServiceTestCase
 class TestCreateZone(FakedServiceTestCase):
     def setUp(self):
         self.user = User.get(email='foo@example.net')
-        self.zone = self.user.create_zone('example.net')
+        self.zone = self.user.create_zone('example.net', 'account_id')
 
     def test_returns_zone_object(self):
         self.assertIsInstance(self.zone, Zone)

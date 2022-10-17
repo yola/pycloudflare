@@ -5,7 +5,7 @@ from demands.pagination import (
 from six.moves.urllib.parse import urlencode
 
 from pycloudflare.config import get_config
-from pycloudflare.exceptions import CustomHostnameNotFound
+from pycloudflare.exceptions import AccountNotFound, CustomHostnameNotFound
 
 
 class ZoneNotFound(Exception):
@@ -25,6 +25,7 @@ def cloudflare_paginated_results(fn, args=(), kwargs=None):
 
 
 class CloudFlareService(HTTPServiceClient):
+
     def __init__(self, api_key, email):
         headers = {
             'X-Auth-Key': api_key,
@@ -44,6 +45,20 @@ class CloudFlareService(HTTPServiceClient):
             'per_page': per_page,
         }
         return self.get(base_url + '?' + urlencode(params))
+
+    def create_account(self, name, account_type='standard'):
+        return self.post('accounts', json={
+            'name': name,
+            'type': account_type
+        })
+
+    def get_account_by_name(self, name):
+        result = self.get('accounts', params={'name': name})
+        assert len(result) <= 1
+        if not result:
+            raise AccountNotFound()
+
+        return result[0]
 
     def get_zones(self, page=1, per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
         return self._get_paginated('zones', page, per_page)
@@ -73,14 +88,11 @@ class CloudFlareService(HTTPServiceClient):
         url = 'zones/%s/settings/%s' % (zone_id, setting)
         return self.patch(url, json={'value': value})
 
-    def create_zone(self, name, jump_start=False, organization=None):
-        data = {
+    def create_zone(self, name, account_id):
+        return self.post('zones', json={
             'name': name,
-            'jump_start': jump_start,
-        }
-        if organization:
-            data['organization'] = {'id': organization}
-        return self.post('zones', json=data)
+            'account': {'id': account_id}
+        })
 
     def delete_zone(self, zone_id):
         return self.delete('zones/%s' % zone_id)

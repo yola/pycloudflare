@@ -7,3 +7,7 @@ class SSLUnavailable(Exception):
 
 class CustomHostnameNotFound(Exception):
     pass
+
+
+class AccountNotFound(Exception):
+    pass

@@ -1,5 +1,14 @@
 # Changelog
 
+## 3.0.0
+* Add `CloudFlareService.create_account()`.
+* Add `CloudFlareService.get_account_by_name()`.
+* Fix `CloudFlareService.create_zone()` to match CloudFlare API.
+* Add `User.create_account_and_zone()`.
+* Add `User.get_or_create_account()`.
+* Fix `User.create_zone()` to match CloudFlare API 
+  and `CloudFlareService.create_zone()`.
+
 ## 2.3.0
 * Add `CloudFlareService.update_custom_hostname()`.
 
