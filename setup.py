@@ -17,7 +17,7 @@ setup(
     packages=['pycloudflare'],
     test_suite='nose.collector',
     install_requires=[
-        'demands >= 4.0.0, < 5.0.0',
+        'demands >= 4.0.0, < 6.0.0',
         'property-caching >= 1.0.0, < 2.0.0',
         'six >= 1.4.0, < 2.0.0',
     ],
