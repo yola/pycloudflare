@@ -17,6 +17,7 @@ CF_PAGINATION_OPTIONS = {
     PAGE_SIZE: 50,
     RESULTS_KEY: None,
 }
+_ADMINSTRATOR_ROLE_ID = '05784afa30c1afe1440e79d9351c7430'
 
 
 def cloudflare_paginated_results(fn, args=(), kwargs=None):
@@ -59,6 +60,21 @@ class CloudFlareService(HTTPServiceClient):
             raise AccountNotFound()
 
         return result[0]
+
+    def add_account_member(
+            self, account_id, email, role=_ADMINSTRATOR_ROLE_ID):
+        return self.post('accounts/{}/members'.format(account_id), json={
+            'email': email,
+            'roles': [role]
+        })
+
+    def list_account_members(self, account_id, page=1, per_page=20):
+        return self._get_paginated(
+            'accounts/{}/members'.format(account_id), page, per_page)
+
+    def remove_account_member(self, account_id, member_id):
+        return self.delete(
+            'accounts/{}/members/{}'.format(account_id, member_id))
 
     def get_zones(self, page=1, per_page=CF_PAGINATION_OPTIONS[PAGE_SIZE]):
         return self._get_paginated('zones', page, per_page)

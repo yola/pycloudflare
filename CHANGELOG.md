@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.1.0
+* Add `CloudFlareService.add_account_member()`.
+* Add `CloudFlareService.list_account_members()`.
+* Add `CloudFlareService.remove_account_member()`.
+
 ## 3.0.0
 * Add `CloudFlareService.create_account()`.
 * Add `CloudFlareService.get_account_by_name()`.
