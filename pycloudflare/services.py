@@ -72,7 +72,7 @@ class CloudFlareService(HTTPServiceClient):
         return self._get_paginated(
             'accounts/{}/members'.format(account_id), page, per_page)
 
-    def remove_account_member(self, account_id, member_id):
+    def delete_account_member(self, account_id, member_id):
         return self.delete(
             'accounts/{}/members/{}'.format(account_id, member_id))
 
