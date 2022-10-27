@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.0
+* Rename `CloudFlareService.remove_account_member()` to 
+  `CloudFlareService.delete_account_member()`.
+
 ## 3.1.0
 * Add `CloudFlareService.add_account_member()`.
 * Add `CloudFlareService.list_account_members()`.
