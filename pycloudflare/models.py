@@ -5,13 +5,14 @@ from property_caching import (
     cached_property, clear_property_cache, set_property_cache)
 from six import iteritems, itervalues
 
-from pycloudflare.exceptions import SSLUnavailable
+from pycloudflare.exceptions import AccountNotFound, SSLUnavailable
 from pycloudflare.services import (
     CloudFlareHostService, CloudFlareService, cloudflare_paginated_results)
 from pycloudflare.utils import translate_errors
 
 
 class User(object):
+
     def __init__(self, email, api_key):
         self.email = email
         self._service = self.get_service(api_key, email)
@@ -81,16 +82,26 @@ class User(object):
             zone_name, self.user_key, subdomains, resolve_to)
         return result
 
-    def create_zone(self, name, jump_start=False, organization=None):
-        zone = self._service.create_zone(name=name, jump_start=jump_start,
-                                         organization=organization)
+    def create_account_and_zone(self, account_name, zone_name):
+        account_data = self.get_or_create_account(account_name)
+        return self.create_zone(zone_name, account_data['id'])
+
+    def create_zone(self, name, account_id):
+        zone = self._service.create_zone(name, account_id)
         return Zone(self, zone)
+
+    def get_or_create_account(self, account_name):
+        try:
+            return self._service.get_account_by_name(account_name)
+        except AccountNotFound:
+            return self._service.create_account(account_name)
 
     def __repr__(self):
         return 'User<%s>' % self.email
 
 
 class Zone(object):
+
     def __init__(self, user, data):
         self.user = user
         self._service = user._service

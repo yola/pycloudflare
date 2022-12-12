@@ -1,7 +1,31 @@
 # Changelog
 
-## 2.2.0
+## 4.1.0
 * Add `CloudFlareService.delete_custom_hostname_by_name()`.
+
+## 4.0.0
+* Rename `CloudFlareService.remove_account_member()` to 
+  `CloudFlareService.delete_account_member()`.
+
+## 3.1.0
+* Add `CloudFlareService.add_account_member()`.
+* Add `CloudFlareService.list_account_members()`.
+* Add `CloudFlareService.remove_account_member()`.
+
+## 3.0.0
+* Add `CloudFlareService.create_account()`.
+* Add `CloudFlareService.get_account_by_name()`.
+* Fix `CloudFlareService.create_zone()` to match CloudFlare API.
+* Add `User.create_account_and_zone()`.
+* Add `User.get_or_create_account()`.
+* Fix `User.create_zone()` to match CloudFlare API 
+  and `CloudFlareService.create_zone()`.
+
+## 2.3.0
+* Add `CloudFlareService.update_custom_hostname()`.
+
+## 2.2.0
+* Add `CloudFlareService.delete_custom_hostname()`.
 
 ## 2.1.0
 * Add `CloudFlareService.create_custom_hostname()`.
