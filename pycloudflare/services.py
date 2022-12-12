@@ -190,7 +190,7 @@ class CloudFlareService(HTTPServiceClient):
             raise CustomHostnameNotFound()
 
         return result[0]
-    
+
     def update_custom_hostname(self, zone_id, hostname_id, **data):
         return self.patch(
             'zones/{}/custom_hostnames/{}'.format(zone_id, hostname_id),
