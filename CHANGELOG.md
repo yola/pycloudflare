@@ -1,5 +1,8 @@
 # Changelog
 
+## 4.1.0
+* Add `CloudFlareService.delete_custom_hostname_by_name()`.
+
 ## 4.0.0
 * Rename `CloudFlareService.remove_account_member()` to 
   `CloudFlareService.delete_account_member()`.
