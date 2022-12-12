@@ -1,4 +1,7 @@
+from copy import deepcopy
+
 from mock import patch
+from six import string_types
 
 from pycloudflare.models import Record, User
 from tests.models import FakedServiceTestCase
@@ -15,7 +18,7 @@ class TestCreateRecord(FakedServiceTestCase):
         self.assertIsInstance(self.record, Record)
 
     def test_has_id_attribute(self):
-        self.assertIsInstance(self.record.id, basestring)
+        self.assertIsInstance(self.record.id, string_types)
 
     def test_has_type_attribute(self):
         self.assertEqual(self.record.type, 'A')
@@ -68,6 +71,34 @@ class TestCreateMXRecord(FakedServiceTestCase):
         self.assertEqual(record.priority, 10)
 
 
+class TestCreateSRVRecord(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.zone = self.user.get_zone_by_name('example.com')
+        self.test_record = self.zone.create_record(
+            'bar.example.com', 'SRV', priority=10, weight=5,
+            service='_sip', protocol='_tcp', port=8806, target='example.net'
+        )
+
+    def test_sets_priority(self):
+        self.assertEqual(self.test_record.data['priority'], 10)
+
+    def test_sets_weight(self):
+        self.assertEqual(self.test_record.data['weight'], 5)
+
+    def test_sets_service(self):
+        self.assertEqual(self.test_record.data['service'], '_sip')
+
+    def test_sets_protocol(self):
+        self.assertEqual(self.test_record.data['proto'], '_tcp')
+
+    def test_sets_port(self):
+        self.assertEqual(self.test_record.data['port'], 8806)
+
+    def test_sets_target(self):
+        self.assertEqual(self.test_record.data['target'], 'example.net')
+
+
 class TestDeleteRecord(FakedServiceTestCase):
     def setUp(self):
         self.user = User.get(email='foo@example.net')
@@ -94,17 +125,19 @@ class TestUpdateRecord(FakedServiceTestCase):
         self.assertEqual(self.record.proxied, True)
 
     def test_save_without_changes_is_noop(self):
-        with patch.object(self.record.service, 'update_dns_record'):
+        with patch.object(self.record._service, 'update_dns_record'):
             self.record.save()
             self.assertEqual(
-                self.record.service.update_dns_record.call_count, 0)
+                self.record._service.update_dns_record.call_count, 0)
 
     def test_save_performs_update(self):
         self.record.proxied = True
-        with patch.object(self.record.service, 'update_dns_record'):
+        record_id = self.record.id
+        record_data = deepcopy(self.record._data)
+        with patch.object(self.record._service, 'update_dns_record'):
             self.record.save()
-            self.record.service.update_dns_record.assert_called_with(
-                self.zone.id, self.record.id, {'proxied': True})
+            self.record._service.update_dns_record.assert_called_with(
+                self.zone.id, record_id, record_data)
 
     def test_invalidates_zone_records_on_rename(self):
         self.assertNotIn('quux.example.com', self.zone.records)
