@@ -6,11 +6,8 @@ class UserAttributeTestsMixin(object):
     def test_sets_email_attribute(self):
         self.assertEqual(self.user.email, 'foo@example.net')
 
-    def test_sets_api_key_attribute(self):
-        self.assertEqual(self.user.api_key, 'fake api_key')
-
     def test_sets_service_attribute(self):
-        self.assertTrue(self.user.service)
+        self.assertTrue(self.user._service)
 
     def test_repr_able(self):
         self.assertEqual(repr(self.user), 'User<foo@example.net>')
@@ -25,6 +22,9 @@ class TestUserCreate(FakedServiceTestCase, UserAttributeTestsMixin):
     def setUp(self):
         self.user = User.get_or_create('foo@example.net', 'bar', 'foo',
                                        'fake unique_id')
+
+    def test_has_user_key(self):
+        self.assertEqual(self.user.user_key, 'fake user_key')
 
 
 class TestUserGet(FakedServiceTestCase, UserAttributeTestsMixin):

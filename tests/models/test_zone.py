@@ -1,11 +1,18 @@
-from pycloudflare.models import Record, User, Zone
+from mock import Mock
+from six import string_types
+from unittest import TestCase
+
+from pycloudflare.exceptions import SSLUnavailable
+from pycloudflare.models import PageRule, Record, User, Zone
+from pycloudflare.services import HTTPServiceError
+from tests import PatchMixin
 from tests.models import FakedServiceTestCase
 
 
 class TestCreateZone(FakedServiceTestCase):
     def setUp(self):
         self.user = User.get(email='foo@example.net')
-        self.zone = self.user.create_zone('example.net')
+        self.zone = self.user.create_zone('example.net', 'account_id')
 
     def test_returns_zone_object(self):
         self.assertIsInstance(self.zone, Zone)
@@ -14,7 +21,7 @@ class TestCreateZone(FakedServiceTestCase):
         self.assertEqual(self.zone.name, 'example.net')
 
     def test_has_id(self):
-        self.assertIsInstance(self.zone.id, basestring)
+        self.assertIsInstance(self.zone.id, string_types)
 
     def test_has_name_servers(self):
         self.assertEqual(self.zone.name_servers,
@@ -55,6 +62,8 @@ class TestDeleteZone(FakedServiceTestCase):
         self.assertNotEqual(self.user.zones, [])
         zone = self.user.get_zone_by_name('example.com')
         zone.delete()
+        zone = self.user.get_zone_by_name('example.org')
+        zone.delete()
         self.assertEqual(self.user.zones, [])
 
 
@@ -71,3 +80,90 @@ class TestZoneRecords(FakedServiceTestCase):
         self.assertIsInstance(self.zone.records, dict)
         self.assertIsInstance(self.zone.records['example.com'], list)
         self.assertIsInstance(self.zone.records['example.com'][0], Record)
+
+
+class TestZonePageRules(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.zone = self.user.get_zone_by_name('example.com')
+
+    def test_iter_page_rules_yields_page_rule_objects(self):
+        page_rule = next(self.zone.iter_page_rules())
+        self.assertIsInstance(page_rule, PageRule)
+
+    def test_page_rules_returns_list_of_page_rule_objects(self):
+        self.assertIsInstance(self.zone.page_rules, list)
+        self.assertIsInstance(self.zone.page_rules[0], PageRule)
+
+
+class TestSetCNameZone(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        self.result = self.user.create_cname_zone(
+            'example.org', ['cname.example.org'], 'resolve-to.example.org')
+
+    def test_returns_correct_data_from_service(self):
+        expected_response = {
+            'hosted_cnames': {
+                'www.example.org': 'resolve-to.example.org'
+            },
+            'zone_name': 'example.org',
+            'forward_tos': {
+                'www.example.org': 'www.example.org.cdn.cloudflare.net'
+            },
+            'resolving_to': 'resolve-to.example.org'
+        }
+        self.assertEqual(self.result, expected_response)
+
+
+class TestGetSSLVerificationInfoForZone(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        zone = self.user.create_cname_zone(
+            'example.org', ['cname.example.org'], 'resolve-to.example.org')
+        zone = self.user.get_zone_by_name('example.org')
+        zone.settings.ssl = 'full'
+        zone.settings.save()
+        self.result = zone.get_ssl_verification_info()
+
+    def test_ssl_verification_info_is_returned(self):
+        self.assertEqual(self.result, 'ssl_verification_info')
+
+
+class TestGetSSLVerificationInfoForZoneWithError(FakedServiceTestCase):
+    def setUp(self):
+        self.user = User.get(email='foo@example.net')
+        zone = self.user.create_cname_zone(
+            'example.org', ['cname.example.org'], 'resolve-to.example.org')
+        zone = self.user.get_zone_by_name('example.org')
+        zone._service = Mock()
+
+        data = {'errors': [{'code': 1001, 'msg': 'msg'}]}
+        zone._service.get_ssl_verification_info.side_effect = (
+            HTTPServiceError(response=Mock(json=Mock(return_value=data)))
+        )
+        self.zone = zone
+
+    def test_proper_exception_is_raised(self):
+        self.assertRaises(SSLUnavailable, self.zone.get_ssl_verification_info)
+
+
+class TestPurgeZone(TestCase, PatchMixin):
+
+    def setUp(self):
+        self.service_mock = self._patch(
+            'pycloudflare.models.CloudFlareService')
+        self.zone = Zone(User('email', 'api_key'), {'id': 'zone_id'})
+
+    def test_full_purge(self):
+        self.zone.purge_cache()
+        self.service_mock.return_value.purge_cache.assert_called_once_with(
+            'zone_id', files=None, hosts=None, tags=None
+        )
+
+    def test_partial_purge(self):
+        self.zone.purge_cache(hosts=['host1', 'host2'], tags=['tag1', 'tag2'])
+        self.service_mock.return_value.purge_cache.assert_called_once_with(
+            'zone_id', files=None, hosts=['host1', 'host2'],
+            tags=['tag1', 'tag2']
+        )
